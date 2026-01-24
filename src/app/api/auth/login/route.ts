@@ -5,14 +5,18 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, createSession } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
+    console.log('Login attempt started');
     try {
-        const { email, password } = await request.json();
+        const body = await request.json();
+        const { email, password } = body;
+        console.log(`Login attempt for email: ${email}`);
 
         if (!email || !password) {
             return NextResponse.json(
@@ -31,6 +35,7 @@ export async function POST(request: NextRequest) {
         });
 
         if (!user) {
+            console.log(`User not found: ${email}`);
             return NextResponse.json(
                 { success: false, error: 'Invalid credentials' },
                 { status: 401 }
@@ -54,7 +59,9 @@ export async function POST(request: NextRequest) {
         }
 
         // Create session
+        console.log('Creating session for user:', user.id);
         const token = await createSession(user.id);
+        console.log('Session token created successfully');
 
         // Set cookie
         const cookieStore = await cookies();
@@ -91,10 +98,10 @@ export async function POST(request: NextRequest) {
             },
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Login error:', error);
         return NextResponse.json(
-            { success: false, error: 'Internal server error' },
+            { success: false, error: `Server error: ${error.message || 'Unknown error'}` },
             { status: 500 }
         );
     }

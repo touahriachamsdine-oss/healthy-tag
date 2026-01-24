@@ -32,10 +32,15 @@ export default function LoginPage() {
                     setError(data.error || 'Invalid credentials');
                 }
             } else {
-                setError('Service unavailable.');
+                try {
+                    const data = await response.json();
+                    setError(data.error || `Error ${response.status}: Service unavailable.`);
+                } catch (e) {
+                    setError(`Error ${response.status}: Service unavailable.`);
+                }
             }
         } catch (err: any) {
-            setError('Connection failed.');
+            setError(`Connection failed: ${err.message}`);
         } finally {
             setIsLoading(false);
         }
