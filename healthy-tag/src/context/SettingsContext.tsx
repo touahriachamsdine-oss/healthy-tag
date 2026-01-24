@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'en' | 'fr' | 'ar';
-type Theme = 'dark' | 'night';
+type Theme = 'light' | 'dark' | 'night';
 
 interface SettingsContextType {
     language: Language;
