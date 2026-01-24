@@ -15,8 +15,7 @@
     "db:reset": "prisma db push --force-reset && npx tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@prisma/adapter-better-sqlite3": "^7.3.0",
-    "@prisma/client": "^7.3.0",
+    "@prisma/client": "^5.22.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/leaflet": "^1.9.21",
     "bcryptjs": "^3.0.3",
@@ -28,7 +27,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",
     "next": "16.1.4",
-    "prisma": "^7.3.0",
+    "prisma": "^5.22.0",
     "react": "19.2.3",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "19.2.3",
