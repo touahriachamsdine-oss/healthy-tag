@@ -4,9 +4,10 @@ import { getCurrentUser } from '@/lib/auth';
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const user = await getCurrentUser();
         if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
@@ -14,7 +15,7 @@ export async function PATCH(
         const { targetTemp, tempMin, tempMax } = body;
 
         await prisma.device.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 targetTemp: targetTemp !== undefined ? parseFloat(targetTemp) : undefined,
                 tempMin: tempMin !== undefined ? parseFloat(tempMin) : undefined,

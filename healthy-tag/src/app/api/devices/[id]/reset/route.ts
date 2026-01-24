@@ -4,20 +4,21 @@ import { getCurrentUser } from '@/lib/auth';
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const user = await getCurrentUser();
         if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
         const device = await prisma.device.findUnique({
-            where: { id: params.id }
+            where: { id }
         });
 
         if (!device) return NextResponse.json({ success: false, error: 'Device not found' }, { status: 404 });
 
         await prisma.device.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 healthStatus: 'HEALTHY',
                 needsManualReset: false

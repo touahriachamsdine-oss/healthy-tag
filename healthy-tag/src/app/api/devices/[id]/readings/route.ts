@@ -4,9 +4,10 @@ import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const user = await getCurrentUser();
         if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
@@ -17,7 +18,7 @@ export async function GET(
         const readings = await prisma.deviceReading.findMany({
             where: {
                 device: {
-                    deviceId: params.id
+                    deviceId: id
                 }
             },
             orderBy: { deviceTimestamp: 'desc' },
@@ -32,15 +33,16 @@ export async function GET(
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params; // Await params
         const body = await request.json();
         const { temperature, humidity } = body;
 
         // 1. Verify Device exists by Serial Number (deviceId)
         const device = await prisma.device.findUnique({
-            where: { deviceId: params.id }
+            where: { deviceId: id }
         });
 
         if (!device) {
