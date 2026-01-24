@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+:root {
+  /* --- SOFT TECH TOKENS (Based on User Snippet) --- */
+
+  /* COLORS */
+  --soft-primary: #6558d3;
+  /* Purple Button */
+  --soft-primary-hover: #4133B7;
+
+  --soft-text-main: #425675;
+  /* Dark Slate Blue */
+  --soft-text-sub: #697e91;
+  /* Grey Blue */
+
+  --soft-bg-card: #ffffff;
+  --soft-bg-inner: #ecf0ff;
+  /* Light Blue/Grey Inner */
+  --soft-bg-badge: #bed6fb;
+  /* Badge BG */
+  --soft-icon-bg: #1FCAC5;
+  /* Teal Icon BG */
+
+  --bg-body: #f5f7fa;
+  /* Light neutral background for contrast */
+
+  /* SHADOWS (Deep Blue Soft) */
+  --shadow-soft: 0 30px 30px -25px rgba(0, 38, 255, 0.205);
+
+  /* BORDERS & RADIUS */
+  --radius-outer: 16px;
+  --radius-inner: 12px;
+  --radius-btn: 6px;
+
+  /* LAYOUT */
+  --sidebar-width: 280px;
+  --max-content-width: 1400px;
+}
+
+/* DARK MODE (Midnight Soft) */
+[data-theme='dark'] {
+  --soft-primary: #8ea1ff;
+  --soft-primary-hover: #6558d3;
+
+  --soft-text-main: #e2e8f0;
+  --soft-text-sub: #94a3b8;
+
+  --soft-bg-card: #1e293b;
+  --soft-bg-inner: #0f172a;
+  --soft-bg-badge: #334155;
+  --soft-icon-bg: #0d9488;
+
+  --bg-body: #0b1120;
+  --shadow-soft: 0 30px 30px -25px rgba(0, 0, 0, 0.5);
+}
+
+/* --- RESET & BASE --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--soft-text-main);
+  -webkit-font-smoothing: antialiased;
+  transition: all 0.3s ease;
+}
+
+/* UTILITIES (Replicating Snippet Style) */
+
+/* .plan style container */
+.card-soft {
+  background-color: var(--soft-bg-card);
+  border-radius: var(--radius-outer);
+  box-shadow: var(--shadow-soft);
+  padding: 24px;
+  color: var(--soft-text-sub);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-soft:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 40px 40px -20px rgba(0, 38, 255, 0.15);
+  /* Slightly lifted */
+}
+
+/* .inner style */
+.card-soft-inner {
+  background-color: var(--soft-bg-inner);
+  border-radius: var(--radius-inner);
+  padding: 28px;
+  position: relative;
+}
+
+/* .button style */
+.btn-soft {
+  background-color: var(--soft-primary);
+  border-radius: var(--radius-btn);
+  color: #fff;
+  font-weight: 500;
+  font-size: 1rem;
+  text-align: center;
+  border: 0;
+  outline: 0;
+  padding: 0.625em 0.75em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-soft:hover {
+  background-color: var(--soft-primary-hover);
+}
+
+/* .icon style */
+.icon-soft {
+  background-color: var(--soft-icon-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.icon-soft svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Badge/Tag style from snippet */
+.badge-soft {
+  background-color: var(--soft-bg-badge);
+  border-radius: 99em;
+  /* Fully rounded or specific 99em 0 0 99em if side */
+  padding: 0.4em 0.8em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--soft-text-main);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--soft-text-sub);
+  border-radius: 10px;
+  opacity: 0.5;
+}

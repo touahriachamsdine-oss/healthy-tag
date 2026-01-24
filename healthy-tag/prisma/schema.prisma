@@ -1,0 +1,368 @@
+// Healthy Tag - Cold Chain Compliance Platform
+// Database Schema for national-grade IoT monitoring
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL") // Uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // Uses direct connection
+}
+
+// ============================================
+// GEOGRAPHIC HIERARCHY
+// ============================================
+
+model Wilaya {
+  id          String      @id @default(cuid())
+  code        String      @unique // e.g., "16" for Algiers
+  name        String
+  nameAr      String?     // Arabic name
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  baladiyas   Baladiya[]
+  admins      User[]
+  devices     Device[]
+}
+
+model Baladiya {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  name        String
+  nameAr      String?
+  wilayaId    String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  wilaya      Wilaya      @relation(fields: [wilayaId], references: [id], onDelete: Cascade)
+  facilities  Facility[]
+  admins      User[]
+  devices     Device[]
+}
+
+model Facility {
+  id          String       @id @default(cuid())
+  name        String
+  type        FacilityType
+  address     String?
+  phone       String?
+  baladiyaId  String
+  latitude    Float?
+  longitude   Float?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  baladiya    Baladiya     @relation(fields: [baladiyaId], references: [id], onDelete: Cascade)
+  devices     Device[]
+}
+
+enum FacilityType {
+  HOSPITAL
+  PHARMACY
+  VACCINE_CENTER
+  FOOD_STORAGE
+  LABORATORY
+  BLOOD_BANK
+  OTHER
+}
+
+// ============================================
+// USER MANAGEMENT & AUTHENTICATION
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String    // Hashed with bcrypt
+  firstName     String
+  lastName      String
+  phone         String?
+  role          UserRole
+  isActive      Boolean   @default(true)
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String?
+  
+  // Scope-based access
+  wilayaId      String?
+  baladiyaId    String?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  wilaya        Wilaya?   @relation(fields: [wilayaId], references: [id])
+  baladiya      Baladiya? @relation(fields: [baladiyaId], references: [id])
+  
+  auditLogs     AuditLog[]
+  alerts        Alert[]
+  sessions      Session[]
+}
+
+enum UserRole {
+  SUPER_ADMIN    // National level - full access
+  WILAYA_ADMIN   // Regional level - wilaya scope
+  BALADIYA_ADMIN // Local level - baladiya scope
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  token       String   @unique
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  userAgent   String?
+  ipAddress   String?
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// DEVICE MANAGEMENT
+// ============================================
+
+model Device {
+  id            String       @id @default(cuid())
+  deviceId      String       @unique // e.g., "HT-DZ-00034"
+  simNumber     String?
+  apiKey        String       @unique // For device authentication
+  
+  type          DeviceType
+  model         String?      // Device model/version
+  firmwareVersion String?
+  
+  // Location
+  facilityId    String?
+  wilayaId      String
+  baladiyaId    String
+  latitude      Float?
+  longitude     Float?
+  
+  // Configuration
+  targetTemp        Float?       @default(4)
+  tempMin           Float        @default(2)  // Minimum allowed temp
+  tempMax           Float        @default(8)  // Maximum allowed temp
+  humidityMin       Float        @default(30)
+  humidityMax       Float        @default(70)
+  alertDelayMinutes Int          @default(15) // Minutes before alert
+  needsManualReset  Boolean      @default(false) // Stays UNHEALTHY until manual reset
+  
+  // Status
+  healthStatus  HealthStatus @default(UNKNOWN)
+  isOnline      Boolean      @default(false)
+  lastSeenAt    DateTime?
+  lastTempValue Float?
+  lastHumidityValue Float?
+  lastLatitude  Float?
+  lastLongitude Float?
+  
+  // Maintenance
+  installDate   DateTime?
+  lastMaintenanceDate DateTime?
+  nextMaintenanceDate DateTime?
+  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  facility      Facility?    @relation(fields: [facilityId], references: [id])
+  wilaya        Wilaya       @relation(fields: [wilayaId], references: [id])
+  baladiya      Baladiya     @relation(fields: [baladiyaId], references: [id])
+  
+  readings      DeviceReading[]
+  alerts        Alert[]
+  events        DeviceEvent[]
+  aiAnalytics   AIAnalytics[]
+}
+
+enum DeviceType {
+  FRIDGE
+  FREEZER
+}
+
+enum HealthStatus {
+  HEALTHY
+  WARNING
+  NOT_HEALTHY
+  OFFLINE
+  UNKNOWN
+}
+
+// ============================================
+// TELEMETRY DATA (Immutable Logs)
+// ============================================
+
+model DeviceReading {
+  id          String   @id @default(cuid())
+  deviceId    String
+  
+  temperature Float
+  humidity    Float
+  latitude    Float?
+  longitude   Float?
+  
+  gsmSignal   Int?     // Signal strength (0-100)
+  batteryLevel Int?    // Battery percentage if applicable
+  
+  healthStatus HealthStatus
+  
+  // Immutable timestamp from device
+  deviceTimestamp DateTime
+  // Server receive time
+  serverTimestamp DateTime @default(now())
+
+  device      Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId, serverTimestamp])
+  @@index([deviceId, deviceTimestamp])
+}
+
+model DeviceEvent {
+  id          String      @id @default(cuid())
+  deviceId    String
+  eventType   EventType
+  description String
+  metadata    String?     // JSON string for additional data
+  
+  timestamp   DateTime    @default(now())
+
+  device      Device      @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId, timestamp])
+}
+
+enum EventType {
+  POWER_ON
+  POWER_OFF
+  NETWORK_CONNECTED
+  NETWORK_DISCONNECTED
+  GPS_LOCATION_CHANGED
+  CONFIG_UPDATED
+  FIRMWARE_UPDATED
+  MAINTENANCE_COMPLETED
+  SENSOR_FAILURE
+  DOOR_OPENED
+  DOOR_CLOSED
+}
+
+// ============================================
+// ALERTS & NOTIFICATIONS
+// ============================================
+
+model Alert {
+  id            String      @id @default(cuid())
+  deviceId      String
+  alertType     AlertType
+  severity      AlertSeverity
+  
+  title         String
+  message       String
+  
+  // Alert context
+  triggerValue  Float?      // The value that triggered alert
+  thresholdValue Float?     // The threshold that was exceeded
+  
+  // Status
+  status        AlertStatus @default(ACTIVE)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  resolvedAt    DateTime?
+  
+  // Notification tracking
+  smsNotified   Boolean     @default(false)
+  emailNotified Boolean     @default(false)
+  
+  createdAt     DateTime    @default(now())
+
+  device        Device      @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  acknowledgedByUser User?  @relation(fields: [acknowledgedBy], references: [id])
+
+  @@index([deviceId, createdAt])
+  @@index([status])
+}
+
+enum AlertType {
+  TEMPERATURE_HIGH
+  TEMPERATURE_LOW
+  HUMIDITY_HIGH
+  HUMIDITY_LOW
+  NO_SIGNAL
+  GPS_MOVED
+  SENSOR_FAILURE
+  POWER_OUTAGE
+  DOOR_OPEN_TOO_LONG
+  COMPRESSOR_ISSUE
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+  DISMISSED
+}
+
+// ============================================
+// AI ANALYTICS
+// ============================================
+
+model AIAnalytics {
+  id          String    @id @default(cuid())
+  deviceId    String
+  
+  // Anomaly Detection
+  anomalyScore Float?   // 0-100, higher = more anomalous
+  anomalyType  String?  // Type of detected anomaly
+  
+  // Predictions
+  predictedFailure Boolean @default(false)
+  failureProbability Float?
+  failureType      String? // e.g., "COMPRESSOR", "DOOR_SEAL"
+  predictedTimeToFailure Int? // Hours until predicted failure
+  
+  // Pattern Analysis
+  patternType      String? // e.g., "DOOR_LEFT_OPEN", "POWER_INSTABILITY"
+  confidence       Float?  // Confidence score 0-1
+  
+  // Recommendations
+  recommendation   String?
+  
+  analyzedAt       DateTime @default(now())
+
+  device           Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId, analyzedAt])
+}
+
+// ============================================
+// AUDIT TRAIL (Immutable)
+// ============================================
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  userId      String?
+  action      String    // e.g., "DEVICE_CREATED", "USER_LOGIN"
+  entityType  String    // e.g., "Device", "User", "Alert"
+  entityId    String?
+  
+  oldValue    String?   // JSON of previous state
+  newValue    String?   // JSON of new state
+  
+  ipAddress   String?
+  userAgent   String?
+  
+  timestamp   DateTime  @default(now())
+
+  user        User?     @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([userId, timestamp])
+  @@index([timestamp])
+}
