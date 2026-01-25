@@ -35,28 +35,41 @@ export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    let step = 'init';
     try {
-        const { id } = await params; // Await params
+        step = 'params';
+        const { id } = await params;
+
+        step = 'body_parse';
         const body = await request.json();
         const { temperature, humidity } = body;
 
+        console.log(`[API] Received reading for device ${id}:`, { temperature, humidity });
+
+        if (temperature === undefined || humidity === undefined) {
+            return NextResponse.json({ success: false, error: 'Missing temp or humidity in body' }, { status: 400 });
+        }
+
+        step = 'db_find_device';
         // 1. Verify Device exists by Serial Number (deviceId)
         const device = await prisma.device.findUnique({
             where: { deviceId: id }
         });
 
         if (!device) {
-            return NextResponse.json({ success: false, error: 'Device not found' }, { status: 404 });
+            console.error(`[API] Device not found: ${id}`);
+            return NextResponse.json({ success: false, error: `Device not found: ${id}` }, { status: 404 });
         }
 
+        step = 'logic_health_check';
         // 2. Check Health Rules
         const isHealthy = (
-            temperature >= (device.tempMin ?? -20) &&
-            temperature <= (device.tempMax ?? 10)
+            Number(temperature) >= (device.tempMin ?? -20) &&
+            Number(temperature) <= (device.tempMax ?? 10)
         );
 
+        step = 'db_create_reading';
         // 3. Save Reading using Internal UUID (device.id)
-        // Schema requires healthStatus enum 'HEALTHY' | 'WARNING' | 'NOT_HEALTHY' ...
         await prisma.deviceReading.create({
             data: {
                 deviceId: device.id, // Correctly link to Foreign Key (UUID)
@@ -67,7 +80,8 @@ export async function POST(
             }
         });
 
-        // 4. Update Device Status (Optional but good for sync)
+        step = 'db_update_device';
+        // 4. Update Device Status
         await prisma.device.update({
             where: { id: device.id },
             data: {
@@ -79,14 +93,14 @@ export async function POST(
             }
         });
 
-        return NextResponse.json({ success: true, healthy: isHealthy });
+        return NextResponse.json({ success: true, healthy: isHealthy, deviceId: id });
 
     } catch (error: any) {
-        console.error('API Error details:', error);
+        console.error(`[API] Error at step '${step}':`, error);
         return NextResponse.json({
             success: false,
-            error: `Database error: ${error.message || 'Unknown error'}`,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            error: `Server Error at '${step}': ${error.message || 'Unknown'}`,
+            details: error.stack
         }, { status: 500 });
     }
 }
