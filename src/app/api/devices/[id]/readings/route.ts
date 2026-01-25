@@ -81,8 +81,12 @@ export async function POST(
 
         return NextResponse.json({ success: true, healthy: isHealthy });
 
-    } catch (error) {
-        console.error('API Error:', error);
-        return NextResponse.json({ success: false, error: 'Error processing reading' }, { status: 500 });
+    } catch (error: any) {
+        console.error('API Error details:', error);
+        return NextResponse.json({
+            success: false,
+            error: `Database error: ${error.message || 'Unknown error'}`,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        }, { status: 500 });
     }
 }
