@@ -42,9 +42,9 @@ export async function POST(
 
         step = 'body_parse';
         const body = await request.json();
-        const { temperature, humidity } = body;
+        const { temperature, humidity, lat, lon } = body;
 
-        console.log(`[API] Received reading for device ${id}:`, { temperature, humidity });
+        console.log(`[API] Received reading for device ${id}:`, { temperature, humidity, lat, lon });
 
         if (temperature === undefined || humidity === undefined) {
             return NextResponse.json({ success: false, error: 'Missing temp or humidity in body' }, { status: 400 });
@@ -72,9 +72,11 @@ export async function POST(
         // 3. Save Reading using Internal UUID (device.id)
         await prisma.deviceReading.create({
             data: {
-                deviceId: device.id, // Correctly link to Foreign Key (UUID)
+                deviceId: device.id,
                 temperature: Number(temperature),
                 humidity: Number(humidity),
+                latitude: lat ? Number(lat) : undefined,
+                longitude: lon ? Number(lon) : undefined,
                 healthStatus: isHealthy ? 'HEALTHY' : 'NOT_HEALTHY',
                 deviceTimestamp: new Date(),
             }
@@ -87,6 +89,8 @@ export async function POST(
             data: {
                 lastTempValue: Number(temperature),
                 lastHumidityValue: Number(humidity),
+                lastLatitude: lat ? Number(lat) : undefined,
+                lastLongitude: lon ? Number(lon) : undefined,
                 lastSeenAt: new Date(),
                 healthStatus: isHealthy ? 'HEALTHY' : 'NOT_HEALTHY',
                 isOnline: true
