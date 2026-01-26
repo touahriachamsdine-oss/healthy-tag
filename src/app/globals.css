@@ -148,6 +148,83 @@ body {
   color: var(--soft-text-main);
 }
 
+/* Input style */
+.input-soft {
+  width: 100%;
+  background-color: var(--soft-bg-inner);
+  border: 2px solid transparent;
+  border-radius: var(--radius-btn);
+  padding: 0.75rem 1rem;
+  color: var(--soft-text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input-soft:focus {
+  border-color: var(--soft-primary);
+  background-color: var(--soft-bg-card);
+  box-shadow: 0 0 0 4px rgba(101, 88, 211, 0.1);
+}
+
+/* Compatibility classes for older/alternate names */
+.neo-card {
+  background-color: var(--soft-bg-card);
+  border-radius: var(--radius-outer);
+  box-shadow: var(--shadow-soft);
+  padding: 24px;
+  color: var(--soft-text-sub);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.neo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 40px 40px -20px rgba(0, 38, 255, 0.15);
+}
+
+.neo-btn {
+  background-color: var(--soft-primary);
+  border-radius: var(--radius-btn);
+  color: #fff;
+  font-weight: 500;
+  font-size: 1rem;
+  text-align: center;
+  border: 0;
+  outline: 0;
+  padding: 0.625em 0.75em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.neo-btn:hover {
+  background-color: var(--soft-primary-hover);
+}
+
+.neo-input {
+  width: 100%;
+  background-color: var(--soft-bg-inner);
+  border: 2px solid transparent;
+  border-radius: var(--radius-btn);
+  padding: 0.75rem 1rem;
+  color: var(--soft-text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.neo-input:focus {
+  border-color: var(--soft-primary);
+  background-color: var(--soft-bg-card);
+  box-shadow: 0 0 0 4px rgba(101, 88, 211, 0.1);
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

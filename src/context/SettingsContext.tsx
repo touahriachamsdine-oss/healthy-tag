@@ -436,16 +436,20 @@ const translations: Record<Language, Record<string, string>> = {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-    const [language, setLanguage] = useState<Language>('en');
-    const [theme, setTheme] = useState<Theme>('dark');
-
-    // Load settings from localStorage
-    useEffect(() => {
-        const savedLang = localStorage.getItem('lang') as Language;
-        const savedTheme = localStorage.getItem('theme') as Theme;
-        if (savedLang) setLanguage(savedLang);
-        if (savedTheme) setTheme(savedTheme);
-    }, []);
+    const [language, setLanguage] = useState<Language>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('lang') as Language;
+            return saved && ['en', 'fr', 'ar'].includes(saved) ? saved : 'en';
+        }
+        return 'en';
+    });
+    const [theme, setTheme] = useState<Theme>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('theme') as Theme;
+            return saved && ['light', 'dark', 'night'].includes(saved) ? saved : 'dark';
+        }
+        return 'dark';
+    });
 
     // Apply theme and direction
     useEffect(() => {
