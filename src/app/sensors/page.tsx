@@ -34,7 +34,7 @@ export default function SensorsPage() {
 
     useEffect(() => {
         fetchData();
-        const interval = setInterval(fetchData, 5000); // Polling every 5 seconds
+        const interval = setInterval(fetchData, 10000); // Polling every 10 seconds
         return () => clearInterval(interval);
     }, []);
 
