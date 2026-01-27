@@ -60,7 +60,7 @@ export default function DashboardPage() {
                 {/* STATS GRID - Using "Plan" Card Style */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {[
-                        { label: t('activeUnits'), value: (stats?.healthyDevices + stats?.warningDevices) || 0, icon: Activity, badge: t('live') },
+                        { label: t('activeUnits'), value: (stats?.healthyDevices || 0) + (stats?.warningDevices || 0), icon: Activity, badge: t('live') },
                         { label: t('totalDevices'), value: stats?.totalDevices || 0, icon: Thermometer, badge: t('total') },
                         { label: t('critical'), value: stats?.unhealthyDevices || 0, icon: Zap, badge: t('actionReq'), highlight: true },
                         { label: t('warnings'), value: stats?.warningDevices || 0, icon: Wind, badge: t('warnings') },
