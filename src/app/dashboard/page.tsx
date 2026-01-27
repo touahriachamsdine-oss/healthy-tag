@@ -60,10 +60,10 @@ export default function DashboardPage() {
                 {/* STATS GRID - Using "Plan" Card Style */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {[
-                        { label: t('activeUnits'), value: stats?.activeDevices || 0, icon: Activity, badge: t('live') },
+                        { label: t('activeUnits'), value: (stats?.healthyDevices + stats?.warningDevices) || 0, icon: Activity, badge: t('live') },
                         { label: t('totalDevices'), value: stats?.totalDevices || 0, icon: Thermometer, badge: t('total') },
-                        { label: t('critical'), value: stats?.deviceHealth?.critical || 0, icon: Zap, badge: t('actionReq'), highlight: true },
-                        { label: t('warnings'), value: stats?.deviceHealth?.warning || 0, icon: Wind, badge: t('warnings') },
+                        { label: t('critical'), value: stats?.unhealthyDevices || 0, icon: Zap, badge: t('actionReq'), highlight: true },
+                        { label: t('warnings'), value: stats?.warningDevices || 0, icon: Wind, badge: t('warnings') },
                     ].map((stat, i) => (
                         <div key={i} className="card-soft">
                             <div className={`card-soft-inner flex flex-col items-start gap-4 h-full ${stat.highlight ? '!bg-red-50' : ''}`}>
