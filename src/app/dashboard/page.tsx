@@ -33,7 +33,12 @@ export default function DashboardPage() {
                 setIsLoading(false);
             }
         };
+
         fetchData();
+
+        // Auto-refresh stats every 10 seconds
+        const interval = setInterval(fetchData, 10000);
+        return () => clearInterval(interval);
     }, []);
 
     if (isLoading && !user) return <div className="min-h-screen bg-[var(--bg-body)]" />;

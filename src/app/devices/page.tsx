@@ -75,6 +75,8 @@ export default function DevicesPage() {
 
     useEffect(() => {
         fetchData();
+        const interval = setInterval(fetchData, 10000);
+        return () => clearInterval(interval);
     }, []);
 
     const handleReset = async (id: string) => {
