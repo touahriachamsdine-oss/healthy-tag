@@ -52,13 +52,38 @@ export async function POST(
 
         step = 'db_find_device';
         // 1. Verify Device exists by Serial Number (deviceId)
-        const device = await prisma.device.findUnique({
+        let device = await prisma.device.findUnique({
             where: { deviceId: id }
         });
 
+        // AUTO-REGISTRATION: If device doesn't exist, create it on the fly!
         if (!device) {
-            console.error(`[API] Device not found: ${id}`);
-            return NextResponse.json({ success: false, error: `Device not found: ${id}` }, { status: 404 });
+            console.log(`[API] Device not found: ${id}. Auto-registering...`);
+            step = 'db_auto_register';
+
+            // We need at least one Wilaya and Baladiya to associate the device
+            // Picking the first available ones for auto-registration
+            const defaultWilaya = await prisma.wilaya.findFirst();
+            const defaultBaladiya = await prisma.baladiya.findFirst();
+
+            if (!defaultWilaya || !defaultBaladiya) {
+                console.error('[API] Cannot auto-register: No wilayas/baladiyas in database');
+                return NextResponse.json({ success: false, error: 'System not initialized (missing regions)' }, { status: 500 });
+            }
+
+            device = await prisma.device.create({
+                data: {
+                    deviceId: id,
+                    type: 'FRIDGE',
+                    model: 'Auto-Registered Prototype',
+                    apiKey: 'auto_' + Math.random().toString(36).substring(7),
+                    wilayaId: defaultWilaya.id,
+                    baladiyaId: defaultBaladiya.id,
+                    isOnline: true,
+                    healthStatus: 'UNKNOWN'
+                }
+            });
+            console.log(`[API] Successfully auto-registered device: ${id}`);
         }
 
         step = 'logic_health_check';

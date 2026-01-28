@@ -22,7 +22,7 @@ export default function DevicesPage() {
     const [facilities, setFacilities] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState('');
-    const [view, setView] = useState<'grid' | 'list'>('grid');
+    const [view, setView] = useState<'grid' | 'list'>('list');
 
     // UI States
     const [selectedDevice, setSelectedDevice] = useState<any>(null);
@@ -206,9 +206,11 @@ export default function DevicesPage() {
                                 <div className="bg-white rounded-[var(--radius-inner)] shadow-sm overflow-hidden">
                                     {/* List Header */}
                                     <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-[var(--soft-bg-inner)] text-xs font-bold text-[var(--soft-text-sub)] uppercase">
-                                        <div className="col-span-4">{t('device')}</div>
+                                        <div className="col-span-3">{t('device')}</div>
                                         <div className="col-span-3">{t('location')}</div>
-                                        <div className="col-span-2 text-center">{t('temp')}</div>
+                                        <div className="col-span-1 text-center">{t('temp')}</div>
+                                        <div className="col-span-1 text-center">{t('min')}</div>
+                                        <div className="col-span-1 text-center">{t('max')}</div>
                                         <div className="col-span-2 text-center">{t('status')}</div>
                                         <div className="col-span-1"></div>
                                     </div>
@@ -218,7 +220,7 @@ export default function DevicesPage() {
                                         {filteredDevices.map(device => (
                                             <div key={device.id} className="grid grid-cols-12 gap-4 items-center px-6 py-5 hover:bg-[var(--soft-bg-inner)]/30 transition-colors group">
                                                 {/* ID & Icon */}
-                                                <div className="col-span-4 flex items-center gap-4">
+                                                <div className="col-span-3 flex items-center gap-4">
                                                     <div className="icon-soft !w-10 !h-10 !bg-[var(--soft-bg-inner)] !text-[var(--soft-primary)]">
                                                         <Server size={18} />
                                                     </div>
@@ -230,7 +232,7 @@ export default function DevicesPage() {
 
                                                 {/* Location */}
                                                 <div className="col-span-3">
-                                                    <p className="font-bold text-[var(--soft-text-main)] text-sm truncate">{device.facility?.name}</p>
+                                                    <p className="font-bold text-[var(--soft-text-main)] text-sm truncate">{device.facility?.name || 'Unassigned'}</p>
                                                     <div className="flex items-center gap-1 text-[var(--soft-text-sub)] mt-0.5">
                                                         <MapPin size={10} />
                                                         <span className="text-[10px]">{device.wilaya?.name}</span>
@@ -238,15 +240,29 @@ export default function DevicesPage() {
                                                 </div>
 
                                                 {/* Temp */}
-                                                <div className="col-span-2 text-center">
+                                                <div className="col-span-1 text-center">
                                                     <span className={`text-lg font-bold tabular-nums ${(device.lastTempValue > device.tempMax || device.lastTempValue < device.tempMin) ? 'text-red-500' : 'text-[var(--soft-text-main)]'}`}>
-                                                        {device.lastTempValue?.toFixed(1)}°
+                                                        {device.lastTempValue?.toFixed(1) || '--'}°
+                                                    </span>
+                                                </div>
+
+                                                {/* Min */}
+                                                <div className="col-span-1 text-center">
+                                                    <span className="text-sm font-medium text-[var(--soft-text-sub)]">
+                                                        {device.tempMin}°
+                                                    </span>
+                                                </div>
+
+                                                {/* Max */}
+                                                <div className="col-span-1 text-center">
+                                                    <span className="text-sm font-medium text-[var(--soft-text-sub)]">
+                                                        {device.tempMax}°
                                                     </span>
                                                 </div>
 
                                                 {/* Status */}
                                                 <div className="col-span-2 flex justify-center">
-                                                    {device.healthStatus === 'NOT_HEALTHY' ? (
+                                                    {device.healthStatus === 'NOT_HEALTHY' || (device.lastTempValue !== null && (device.lastTempValue > device.tempMax || device.lastTempValue < device.tempMin)) ? (
                                                         <button onClick={() => handleReset(device.id)} className="badge-soft !bg-red-50 !text-red-600 flex items-center gap-1 cursor-pointer hover:bg-red-100">
                                                             <AlertTriangle size={10} />
                                                             {t('critical')}
@@ -261,8 +277,11 @@ export default function DevicesPage() {
 
                                                 {/* Actions */}
                                                 <div className="col-span-1 flex justify-end">
-                                                    <button onClick={() => fetchLogs(device.id)} className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--soft-text-sub)] hover:text-[var(--soft-primary)] hover:bg-[var(--soft-bg-inner)] transition-colors">
-                                                        <History size={16} />
+                                                    <button
+                                                        onClick={() => fetchLogs(device.id)}
+                                                        className="btn-soft !px-3 !py-1.5 !text-[10px] !bg-[var(--soft-bg-inner)] !text-[var(--soft-primary)] hover:!bg-[var(--soft-primary)] hover:!text-white transition-all shadow-sm"
+                                                    >
+                                                        {t('logs')}
                                                     </button>
                                                 </div>
                                             </div>
