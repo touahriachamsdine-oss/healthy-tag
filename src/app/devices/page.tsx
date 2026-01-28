@@ -134,6 +134,35 @@ export default function DevicesPage() {
         }
     };
 
+    const handleUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        try {
+            const res = await fetch(`/api/devices/${editingId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editValues)
+            });
+            if (res.ok) {
+                setEditingId(null);
+                fetchData();
+            }
+        } catch (error) {
+            console.error('Update failed:', error);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const openEdit = (device: any) => {
+        setEditingId(device.id);
+        setEditValues({
+            targetTemp: device.targetTemp || 4,
+            tempMin: device.tempMin || 2,
+            tempMax: device.tempMax || 8
+        });
+    };
+
     const filteredDevices = devices.filter(d =>
         d.deviceId.toLowerCase().includes(search.toLowerCase()) ||
         d.facility?.name?.toLowerCase().includes(search.toLowerCase())
@@ -276,7 +305,13 @@ export default function DevicesPage() {
                                                 </div>
 
                                                 {/* Actions */}
-                                                <div className="col-span-1 flex justify-end">
+                                                <div className="col-span-1 flex justify-end gap-2">
+                                                    <button
+                                                        onClick={() => openEdit(device)}
+                                                        className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--soft-text-sub)] hover:text-[var(--soft-primary)] hover:bg-[var(--soft-bg-inner)] transition-colors"
+                                                    >
+                                                        <Settings2 size={16} />
+                                                    </button>
                                                     <button
                                                         onClick={() => fetchLogs(device.id)}
                                                         className="btn-soft !px-3 !py-1.5 !text-[10px] !bg-[var(--soft-bg-inner)] !text-[var(--soft-primary)] hover:!bg-[var(--soft-primary)] hover:!text-white transition-all shadow-sm"
@@ -317,6 +352,9 @@ export default function DevicesPage() {
                                                                 {device.lastTempValue?.toFixed(1)}°
                                                             </p>
                                                         </div>
+                                                        <button onClick={() => openEdit(device)} className="btn-soft !px-3 !py-1.5 !text-xs !bg-white !text-slate-500 hover:!text-[var(--soft-primary)] shadow-sm">
+                                                            <Settings2 size={14} />
+                                                        </button>
                                                         <button onClick={() => fetchLogs(device.id)} className="btn-soft !px-3 !py-1.5 !text-xs !bg-white !text-[var(--soft-primary)] hover:!bg-[var(--soft-primary)] hover:!text-white shadow-sm">
                                                             {t('logs')}
                                                         </button>
@@ -398,6 +436,75 @@ export default function DevicesPage() {
                                 {t('addDevice')}
                             </button>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* Edit Settings Modal */}
+            {editingId && (
+                <div className="fixed inset-0 z-[4000] flex items-center justify-center bg-black/30 backdrop-blur-md p-4">
+                    <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+                        <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+                            <h3 className="font-bold text-[var(--soft-text-main)] text-xl">Device Configuration</h3>
+                            <button onClick={() => setEditingId(null)} className="text-slate-400 hover:text-red-500"><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleUpdate} className="p-8 space-y-8">
+                            <div className="grid grid-cols-1 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">Target Temp (°C)</label>
+                                    <input type="number" step="0.1" className="w-full h-14 rounded-2xl bg-slate-50 border-none px-6 font-bold text-lg" value={editValues.targetTemp} onChange={e => setEditValues({ ...editValues, targetTemp: parseFloat(e.target.value) })} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">Min Temp</label>
+                                        <input type="number" step="0.1" className="w-full h-14 rounded-2xl bg-slate-50 border-none px-6 font-bold text-lg" value={editValues.tempMin} onChange={e => setEditValues({ ...editValues, tempMin: parseFloat(e.target.value) })} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">Max Temp</label>
+                                        <input type="number" step="0.1" className="w-full h-14 rounded-2xl bg-slate-50 border-none px-6 font-bold text-lg" value={editValues.tempMax} onChange={e => setEditValues({ ...editValues, tempMax: parseFloat(e.target.value) })} />
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" disabled={isSaving} className="btn-soft w-full h-14 text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200">
+                                {isSaving ? 'Saving...' : 'Save Configuration'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Logs Modal */}
+            {showLogs && (
+                <div className="fixed inset-0 z-[4000] flex items-center justify-center bg-black/30 backdrop-blur-md p-4">
+                    <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-2xl h-[80vh] overflow-hidden flex flex-col">
+                        <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-bold text-[var(--soft-text-main)] text-xl">Telemetry Logs</h3>
+                                <p className="text-xs text-slate-400 font-mono">{selectedDevice?.deviceId}</p>
+                            </div>
+                            <button onClick={() => setShowLogs(false)} className="text-slate-400 hover:text-red-500"><X size={24} /></button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-8">
+                            <div className="space-y-4">
+                                {logs.length === 0 ? (
+                                    <div className="text-center py-20 text-slate-400">No logs found for this period.</div>
+                                ) : (
+                                    logs.map((log: any, idx: number) => (
+                                        <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-2 h-2 rounded-full ${log.healthStatus === 'HEALTHY' ? 'bg-emerald-500' : 'bg-red-500 animate-pulse'}`} />
+                                                <div>
+                                                    <p className="text-sm font-bold text-slate-700">{log.temperature.toFixed(1)}°C</p>
+                                                    <p className="text-[10px] text-slate-400 uppercase font-black">{new Date(log.deviceTimestamp).toLocaleString()}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right text-[10px] font-mono text-slate-300">
+                                                {log.latitude?.toFixed(4)}, {log.longitude?.toFixed(4)}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
