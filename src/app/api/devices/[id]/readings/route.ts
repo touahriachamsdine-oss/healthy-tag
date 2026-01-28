@@ -14,12 +14,13 @@ export async function GET(
         const searchParams = new URL(request.url).searchParams;
         const limit = parseInt(searchParams.get('limit') || '100');
 
-        // Allow fetching by Serial Number (deviceId) or internal ID
+        // Allow fetching by Serial Number (deviceId) or internal UUID
         const readings = await prisma.deviceReading.findMany({
             where: {
-                device: {
-                    deviceId: id
-                }
+                OR: [
+                    { deviceId: id }, // Match internal UUID
+                    { device: { deviceId: id } } // Match Serial Number (HT-DZ-...)
+                ]
             },
             orderBy: { deviceTimestamp: 'desc' },
             take: limit
