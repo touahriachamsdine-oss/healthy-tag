@@ -6,7 +6,7 @@ import { useSettings } from '@/context/SettingsContext';
 import {
     Search, Plus, Filter, List, Grid,
     Settings2, History, AlertTriangle,
-    CheckCircle2, X,
+    CheckCircle2, X, Save,
     Smartphone, Server, ShieldCheck, MapPin, ChevronDown
 } from 'lucide-react';
 
@@ -31,6 +31,7 @@ export default function DevicesPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editValues, setEditValues] = useState({ targetTemp: 4, tempMin: 2, tempMax: 8 });
+    const [pendingChanges, setPendingChanges] = useState<Record<string, { tempMin: number, tempMax: number }>>({});
 
     // Registration Modal States
     const [showRegister, setShowRegister] = useState(false);
@@ -131,6 +132,30 @@ export default function DevicesPage() {
             if (data.success) setLogs(data.data);
         } catch (error) {
             console.error('Logs fetch failed:', error);
+        }
+    };
+
+    const handleInlineSave = async (id: string) => {
+        const changes = pendingChanges[id];
+        if (!changes) return;
+
+        setIsSaving(true);
+        try {
+            const res = await fetch(`/api/devices/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(changes)
+            });
+            if (res.ok) {
+                const newPending = { ...pendingChanges };
+                delete newPending[id];
+                setPendingChanges(newPending);
+                fetchData();
+            }
+        } catch (error) {
+            console.error('Update failed:', error);
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -277,16 +302,36 @@ export default function DevicesPage() {
 
                                                 {/* Min */}
                                                 <div className="col-span-1 text-center">
-                                                    <span className="text-sm font-medium text-[var(--soft-text-sub)]">
-                                                        {device.tempMin}°
-                                                    </span>
+                                                    <input
+                                                        type="number"
+                                                        step="0.1"
+                                                        className="w-16 h-8 bg-slate-50 rounded-lg text-center font-bold text-xs border border-transparent focus:border-[var(--soft-primary)] outline-none"
+                                                        value={pendingChanges[device.id]?.tempMin ?? device.tempMin}
+                                                        onChange={e => setPendingChanges({
+                                                            ...pendingChanges,
+                                                            [device.id]: {
+                                                                tempMax: pendingChanges[device.id]?.tempMax ?? device.tempMax,
+                                                                tempMin: parseFloat(e.target.value)
+                                                            }
+                                                        })}
+                                                    />
                                                 </div>
 
                                                 {/* Max */}
                                                 <div className="col-span-1 text-center">
-                                                    <span className="text-sm font-medium text-[var(--soft-text-sub)]">
-                                                        {device.tempMax}°
-                                                    </span>
+                                                    <input
+                                                        type="number"
+                                                        step="0.1"
+                                                        className="w-16 h-8 bg-slate-50 rounded-lg text-center font-bold text-xs border border-transparent focus:border-[var(--soft-primary)] outline-none"
+                                                        value={pendingChanges[device.id]?.tempMax ?? device.tempMax}
+                                                        onChange={e => setPendingChanges({
+                                                            ...pendingChanges,
+                                                            [device.id]: {
+                                                                tempMin: pendingChanges[device.id]?.tempMin ?? device.tempMin,
+                                                                tempMax: parseFloat(e.target.value)
+                                                            }
+                                                        })}
+                                                    />
                                                 </div>
 
                                                 {/* Status */}
@@ -306,12 +351,15 @@ export default function DevicesPage() {
 
                                                 {/* Actions */}
                                                 <div className="col-span-1 flex justify-end gap-2">
-                                                    <button
-                                                        onClick={() => openEdit(device)}
-                                                        className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--soft-text-sub)] hover:text-[var(--soft-primary)] hover:bg-[var(--soft-bg-inner)] transition-colors"
-                                                    >
-                                                        <Settings2 size={16} />
-                                                    </button>
+                                                    {pendingChanges[device.id] && (
+                                                        <button
+                                                            onClick={() => handleInlineSave(device.id)}
+                                                            className="w-8 h-8 rounded-full flex items-center justify-center bg-emerald-500 text-white shadow-lg shadow-emerald-200 animate-bounce"
+                                                            title="Save changes"
+                                                        >
+                                                            <Save size={14} />
+                                                        </button>
+                                                    )}
                                                     <button
                                                         onClick={() => fetchLogs(device.id)}
                                                         className="btn-soft !px-3 !py-1.5 !text-[10px] !bg-[var(--soft-bg-inner)] !text-[var(--soft-primary)] hover:!bg-[var(--soft-primary)] hover:!text-white transition-all shadow-sm"
@@ -439,38 +487,7 @@ export default function DevicesPage() {
                     </div>
                 </div>
             )}
-            {/* Edit Settings Modal */}
-            {editingId && (
-                <div className="fixed inset-0 z-[4000] flex items-center justify-center bg-black/30 backdrop-blur-md p-4">
-                    <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
-                        <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-bold text-[var(--soft-text-main)] text-xl">Device Configuration</h3>
-                            <button onClick={() => setEditingId(null)} className="text-slate-400 hover:text-red-500"><X size={20} /></button>
-                        </div>
-                        <form onSubmit={handleUpdate} className="p-8 space-y-8">
-                            <div className="grid grid-cols-1 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">Target Temp (°C)</label>
-                                    <input type="number" step="0.1" className="w-full h-14 rounded-2xl bg-slate-50 border-none px-6 font-bold text-lg" value={editValues.targetTemp} onChange={e => setEditValues({ ...editValues, targetTemp: parseFloat(e.target.value) })} />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">Min Temp</label>
-                                        <input type="number" step="0.1" className="w-full h-14 rounded-2xl bg-slate-50 border-none px-6 font-bold text-lg" value={editValues.tempMin} onChange={e => setEditValues({ ...editValues, tempMin: parseFloat(e.target.value) })} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">Max Temp</label>
-                                        <input type="number" step="0.1" className="w-full h-14 rounded-2xl bg-slate-50 border-none px-6 font-bold text-lg" value={editValues.tempMax} onChange={e => setEditValues({ ...editValues, tempMax: parseFloat(e.target.value) })} />
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="submit" disabled={isSaving} className="btn-soft w-full h-14 text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200">
-                                {isSaving ? 'Saving...' : 'Save Configuration'}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
+            {/* Configuration Modal removed as requested to use inline editing */}
 
             {/* Logs Modal */}
             {showLogs && (
