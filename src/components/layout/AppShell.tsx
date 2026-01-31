@@ -15,12 +15,16 @@ export function AppShell({ children, user }: AppShellProps) {
     const isRTL = language === 'ar';
 
     return (
-        <div className="flex min-h-screen bg-[var(--bg-body)] text-[var(--soft-text-main)] transition-colors duration-300">
+        <div
+            className="flex min-h-screen bg-[var(--bg-body)] text-[var(--soft-text-main)] transition-colors duration-300 overflow-x-hidden"
+            dir={isRTL ? 'rtl' : 'ltr'}
+        >
             {/* Sidebar - Fixed Position */}
             <aside
                 className={`
-                    fixed inset-y-0 z-[3000] w-[var(--sidebar-width)] 
-                    ${isRTL ? 'right-0' : 'left-0'}
+                    fixed inset-y-0 z-[3000] w-[var(--sidebar-width)]
+                    transition-all duration-300 ease-in-out
+                    ${isRTL ? 'right-0 border-l border-[var(--border-subtle)]' : 'left-0 border-r border-[var(--border-subtle)]'}
                 `}
             >
                 <Sidebar
@@ -31,18 +35,17 @@ export function AppShell({ children, user }: AppShellProps) {
                 />
             </aside>
 
-            {/* Main Content Area - Explicitly Padded via Tailwind */}
+            {/* Main Content Area */}
             <main
                 className={`
                     flex-1 min-w-0 flex flex-col relative z-0 box-border
-                    transition-all duration-300
+                    transition-all duration-300 ease-in-out
                 `}
                 style={{
-                    marginLeft: isRTL ? 0 : '280px',
-                    marginRight: isRTL ? '280px' : 0
+                    [isRTL ? 'paddingRight' : 'paddingLeft']: 'var(--sidebar-width)',
                 }}
             >
-                <div className="w-full max-w-[var(--max-content-width)] mx-auto p-4 md:p-8">
+                <div className="w-full max-w-[var(--max-content-width)] mx-auto p-6 md:p-10 animate-fade-in">
                     {children}
                 </div>
             </main>

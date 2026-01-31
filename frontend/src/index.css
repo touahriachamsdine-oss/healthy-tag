@@ -1,0 +1,114 @@
+@import "leaflet/dist/leaflet.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* DARK THEME */
+  --bg-main: #020617;
+  --bg-card: #0f172a;
+  --bg-sidebar: #020617;
+  --text-primary: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.light-theme {
+  /* LIGHT THEME - MAX CONTRAST */
+  --bg-main: #ffffff;
+  --bg-card: #f8fafc;
+  --bg-sidebar: #f8fafc;
+  --text-primary: #000000;
+  --text-muted: #474747;
+  --border-color: #000000;
+}
+
+@layer base {
+  body {
+    @apply antialiased font-sans transition-colors duration-200;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+  }
+}
+
+.dark-theme {
+  background-image:
+    radial-gradient(at 0% 0%, hsla(250, 24%, 9%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(230, 40%, 15%, 1) 0, transparent 50%);
+}
+
+.glass-card {
+  @apply border rounded-2xl transition-all duration-300;
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+.light-theme .glass-card {
+  @apply shadow-none border-2;
+  border-color: #00000015;
+}
+
+/* Force Map Height */
+.map-host {
+  height: 600px !important;
+  min-height: 600px !important;
+  width: 100% !important;
+  background: #e5e7eb;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  z-index: 1;
+}
+
+/* RTL FIXED */
+[dir="rtl"] .sidebar-fixed {
+  right: 0;
+  left: auto;
+  border-left: 1px solid var(--border-color);
+}
+
+[dir="ltr"] .sidebar-fixed {
+  left: 0;
+  right: auto;
+  border-right: 1px solid var(--border-color);
+}
+
+.status-glow-healthy {
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.1);
+}
+
+.status-glow-unhealthy {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.1);
+}
+
+/* Ensure text colors in specific containers */
+.light-theme h1,
+.light-theme h2,
+.light-theme h3,
+.light-theme p,
+.light-theme span,
+.light-theme th,
+.light-theme td {
+  color: #000000 !important;
+}
+
+.light-theme .text-slate-400,
+.light-theme .text-slate-500 {
+  color: #4b5563 !important;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300/30 rounded-full hover:bg-slate-300/50;
+}
