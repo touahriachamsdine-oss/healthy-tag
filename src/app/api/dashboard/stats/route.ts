@@ -66,6 +66,14 @@ export async function GET(request: NextRequest) {
             },
         });
 
+        // Get recent alerts for activity feed
+        const recentAlertsData = await prisma.alert.findMany({
+            where: { device: deviceFilter },
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+            include: { device: { select: { deviceId: true } } }
+        });
+
         return NextResponse.json({
             success: true,
             data: {
@@ -78,8 +86,10 @@ export async function GET(request: NextRequest) {
                 activeAlerts,
                 complianceRate,
                 readingsLast24h: recentReadings,
+                recentAlerts: recentAlertsData,
             },
         });
+
 
     } catch (error) {
         console.error('Dashboard stats error:', error);

@@ -10,6 +10,7 @@ import { Stack } from '@/components/layout/Stack';
 export default function ReportsPage() {
     const { t } = useSettings();
     const [user, setUser] = useState<any>(null);
+    const [devices, setDevices] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -20,8 +21,13 @@ export default function ReportsPage() {
                     const userData = await userRes.json();
                     setUser(userData.user);
                 }
+                const devicesRes = await fetch('/api/dashboard/devices?limit=100');
+                if (devicesRes.ok) {
+                    const data = await devicesRes.json();
+                    setDevices(data.data);
+                }
             } catch (error) {
-                console.error('Failed to fetch user:', error);
+                console.error('Failed to fetch report data:', error);
             } finally {
                 setIsLoading(false);
             }
@@ -39,41 +45,76 @@ export default function ReportsPage() {
 
     return (
         <AppShell user={user}>
-            <Stack gap={8}>
+            <Stack gap={8} className="pb-32">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between w-full gap-[var(--space-6)] border-b border-[var(--border-color)] pb-[var(--space-6)]">
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-3 text-blue-600">
-                            <div className="p-2 bg-blue-100 dark:bg-blue-500/10 rounded-[var(--radius-md)]">
-                                <FileText size={20} />
-                            </div>
-                            <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                                ANALYTICS & COMPLIANCE
-                            </span>
-                        </div>
-                        <div>
-                            <h1 className="text-3xl font-bold text-[var(--text-primary)] leading-tight">{t('reports')}</h1>
-                            <p className="text-sm text-[var(--text-muted)] mt-2 max-w-xl leading-relaxed">{t('generateReports')}</p>
-                        </div>
-                    </div>
+                <div className="flex flex-col gap-2 mb-8 border-b border-[var(--border-subtle)] pb-8">
+                    <h1 className="text-4xl font-black text-[var(--soft-text-main)] tracking-tight">{t('reports')}</h1>
+                    <p className="text-[var(--soft-text-sub)] font-medium max-w-2xl">
+                        Generate and download regulatory compliance documents for your cold chain storage facilities.
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--space-6)]">
+                {/* Report Generation Center */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {reportTypes.map((report, i) => (
-                        <Card key={i} className="flex flex-col items-center text-center !p-10 bg-[var(--bg-surface)] hover:shadow-lg transition-all">
-                            <div className="w-20 h-20 rounded-[var(--radius-xl)] bg-[var(--bg-body)] border border-[var(--border-color)] flex items-center justify-center mb-8 text-blue-600">
-                                <report.icon size={40} />
+                        <div key={i} className="card-soft group hover:shadow-xl transition-all border-2 border-transparent hover:border-indigo-100">
+                            <div className="flex flex-col items-center text-center p-6">
+                                <div className="w-20 h-20 rounded-[32px] bg-slate-50 border border-slate-100 flex items-center justify-center mb-8 text-indigo-600 transition-transform group-hover:scale-110 shadow-sm">
+                                    <report.icon size={40} />
+                                </div>
+                                <h3 className="text-xl font-bold text-[var(--soft-text-main)] mb-3">{report.title}</h3>
+                                <p className="text-sm font-medium text-[var(--soft-text-sub)] mb-8 leading-relaxed opacity-80">{report.desc}</p>
+                                <button className="w-full h-12 bg-[var(--soft-primary)] hover:bg-indigo-600 text-white rounded-[20px] font-bold text-sm shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all active:scale-95">
+                                    <Download size={18} />
+                                    {t('exportPDF') || 'Export PDF'}
+                                </button>
                             </div>
-                            <h3 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight mb-4">{report.title}</h3>
-                            <p className="text-sm font-medium text-[var(--text-secondary)] mb-10 leading-relaxed">{report.desc}</p>
-                            <button className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-[var(--radius-md)] font-bold text-sm shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transition-all active:scale-95">
-                                <Download size={18} />
-                                {t('exportPDF') || 'Export PDF'}
-                            </button>
-                        </Card>
+                        </div>
                     ))}
+                </div>
+
+                {/* Live Asset Inventory Table */}
+                <div className="mt-12 card-soft bg-[var(--soft-bg-inner)]">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="w-1.5 h-8 bg-emerald-500 rounded-full" />
+                            <h2 className="text-2xl font-bold text-[var(--soft-text-main)]">Asset Inventory Status</h2>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-separate border-spacing-y-3">
+                            <thead>
+                                <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                    <th className="px-6 pb-2">Device ID</th>
+                                    <th className="px-6 pb-2">Facility</th>
+                                    <th className="px-6 pb-2">Wilaya</th>
+                                    <th className="px-6 pb-2">Status</th>
+                                    <th className="px-6 pb-2">Last Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {devices.map((device) => (
+                                    <tr key={device.id} className="bg-white group hover:shadow-md transition-all">
+                                        <td className="px-6 py-4 rounded-l-2xl font-mono text-sm font-bold text-indigo-600 border border-r-0 border-transparent group-hover:border-indigo-50">{device.deviceId}</td>
+                                        <td className="px-6 py-4 text-sm font-bold text-slate-700 border-y border-transparent group-hover:border-indigo-50">{device.facility?.name || '---'}</td>
+                                        <td className="px-6 py-4 text-sm font-medium text-slate-500 border-y border-transparent group-hover:border-indigo-50">{device.wilaya?.name}</td>
+                                        <td className="px-6 py-4 border-y border-transparent group-hover:border-indigo-50">
+                                            <span className={`text-[9px] font-black tracking-widest px-2 py-0.5 rounded-full ${device.healthStatus === 'HEALTHY' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                                                {device.healthStatus}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 rounded-r-2xl border border-l-0 border-transparent group-hover:border-indigo-50 text-xs text-slate-400">
+                                            {device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleString() : 'Never'}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </Stack>
         </AppShell>
     );
 }
+

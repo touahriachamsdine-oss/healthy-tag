@@ -142,21 +142,34 @@ export default function DashboardPage() {
                             </div>
 
                             <div className="flex-1 space-y-6">
-                                {[1, 2, 3, 4, 5].map((_, i) => (
-                                    <div key={i} className="flex items-start gap-4 group p-1 rounded-xl transition-all">
-                                        <div className="icon-soft !w-10 !h-10 !bg-white !text-indigo-600 shadow-sm transition-transform duration-300 group-hover:scale-110">
-                                            <Thermometer size={18} />
-                                        </div>
-                                        <div className="flex-1 border-b border-[var(--border-subtle)] pb-4 group-last:border-0">
-                                            <div className="flex justify-between items-start mb-1">
-                                                <p className="text-sm font-bold text-[var(--soft-text-main)] group-hover:text-[var(--soft-primary)] transition-colors">{t('temperatureWarning')}</p>
-                                                <span className="text-[10px] font-bold text-[var(--soft-text-muted)]">10:4{i} AM</span>
+                                {stats?.recentAlerts?.length > 0 ? (
+                                    stats.recentAlerts.map((alert: any, i: number) => (
+                                        <div key={alert.id} className="flex items-start gap-4 group p-1 rounded-xl transition-all">
+                                            <div className={`icon-soft !w-10 !h-10 transition-transform duration-300 group-hover:scale-110 shadow-sm ${alert.severity === 'CRITICAL' ? '!bg-rose-50 !text-rose-600' : '!bg-amber-50 !text-amber-600'}`}>
+                                                <TrendingUp size={18} />
                                             </div>
-                                            <p className="text-xs font-bold text-[var(--soft-text-sub)] opacity-80">{t('unit')} 102 • Wilaya Algiers</p>
+                                            <div className="flex-1 border-b border-[var(--border-subtle)] pb-4 group-last:border-0">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <p className="text-sm font-bold text-[var(--soft-text-main)] group-hover:text-[var(--soft-primary)] transition-colors line-clamp-1">{alert.title || t('temperatureWarning')}</p>
+                                                    <span className="text-[10px] font-bold text-[var(--soft-text-muted)] whitespace-nowrap ml-2">
+                                                        {new Date(alert.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs font-bold text-[var(--soft-text-sub)] opacity-80 uppercase tracking-tight">NODE {alert.device?.deviceId} • {alert.type}</p>
+                                            </div>
                                         </div>
+                                    ))
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-48 text-center text-[var(--soft-text-muted)]">
+                                        <div className="w-12 h-12 rounded-full border-2 border-dashed border-slate-200 flex items-center justify-center mb-4">
+                                            <CheckCircle size={20} className="text-emerald-500" />
+                                        </div>
+                                        <p className="text-sm font-bold">{t('allSystemsNormal') || 'All systems healthy'}</p>
+                                        <p className="text-[10px] uppercase tracking-widest mt-1">No recent alerts</p>
                                     </div>
-                                ))}
+                                )}
                             </div>
+
 
                             <div className="mt-8">
                                 <Link href="/alerts" className="btn-soft !bg-[var(--soft-bg-card)] !text-indigo-600 border border-indigo-100 hover:!bg-indigo-50 w-full">
