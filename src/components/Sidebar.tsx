@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
     LayoutDashboard,
     Thermometer,
@@ -30,7 +30,20 @@ interface SidebarProps {
 
 export default function Sidebar({ userRole, userName, scopeName, isEmbedded = false }: SidebarProps) {
     const pathname = usePathname();
+    const router = useRouter();
     const { t, theme, setTheme, setLanguage, language } = useSettings();
+
+    const handleLogout = async () => {
+        try {
+            const res = await fetch('/api/auth/logout', { method: 'POST' });
+            if (res.ok) {
+                router.push('/login');
+                router.refresh();
+            }
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
 
     const menuItems = [
         { id: 'dashboard', icon: LayoutDashboard, path: '/dashboard', label: t('dashboard') },
@@ -134,7 +147,10 @@ export default function Sidebar({ userRole, userName, scopeName, isEmbedded = fa
                             <p className="text-sm font-bold text-[var(--soft-text-main)] truncate leading-none mb-1">{userName || 'User'}</p>
                             <p className="text-[11px] font-medium text-[var(--soft-text-sub)] truncate uppercase tracking-tighter opacity-80">{userRole || 'Administrator'}</p>
                         </div>
-                        <button className="p-2 text-[var(--soft-text-muted)] hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                        <button
+                            onClick={handleLogout}
+                            className="p-2 text-[var(--soft-text-muted)] hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                        >
                             <LogOut size={18} />
                         </button>
                     </div>
