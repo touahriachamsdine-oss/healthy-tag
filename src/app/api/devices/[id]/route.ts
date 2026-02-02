@@ -12,7 +12,8 @@ export async function PATCH(
         if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
         const body = await request.json();
-        const { targetTemp, tempMin, tempMax } = body;
+        const { targetTemp, tempMin, tempMax, healthStatus } = body;
+
 
         await prisma.device.update({
             where: { id },
@@ -20,8 +21,10 @@ export async function PATCH(
                 targetTemp: targetTemp !== undefined ? parseFloat(targetTemp) : undefined,
                 tempMin: tempMin !== undefined ? parseFloat(tempMin) : undefined,
                 tempMax: tempMax !== undefined ? parseFloat(tempMax) : undefined,
+                healthStatus: healthStatus !== undefined ? healthStatus : undefined,
             }
         });
+
 
         return NextResponse.json({ success: true });
     } catch (error) {

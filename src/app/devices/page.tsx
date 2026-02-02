@@ -90,6 +90,24 @@ export default function DevicesPage() {
         }
     };
 
+    const handleToggleHealth = async (device: any) => {
+        const newStatus = device.healthStatus === 'HEALTHY' ? 'NOT_HEALTHY' : 'HEALTHY';
+        const msg = newStatus === 'HEALTHY' ? 'Change to Healthy status?' : 'Force Not Healthy status?';
+        if (!confirm(msg)) return;
+
+        try {
+            const res = await fetch(`/api/devices/${device.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ healthStatus: newStatus })
+            });
+            if (res.ok) fetchData();
+        } catch (error) {
+            console.error('Toggle failed:', error);
+        }
+    };
+
+
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setRegisterError('');
@@ -335,19 +353,36 @@ export default function DevicesPage() {
                                                 </div>
 
                                                 {/* Status */}
-                                                <div className="col-span-2 flex justify-center">
+                                                <div className="col-span-2 flex justify-center items-center gap-2">
                                                     {device.healthStatus === 'NOT_HEALTHY' || (device.lastTempValue !== null && (device.lastTempValue > device.tempMax || device.lastTempValue < device.tempMin)) ? (
-                                                        <button onClick={() => handleReset(device.id)} className="badge-soft !bg-red-50 !text-red-600 flex items-center gap-1 cursor-pointer hover:bg-red-100">
-                                                            <AlertTriangle size={10} />
-                                                            {t('critical')}
-                                                        </button>
+                                                        <div className="flex flex-col items-center gap-1">
+                                                            <div className="badge-soft !bg-red-50 !text-red-600 flex items-center gap-1">
+                                                                <AlertTriangle size={10} />
+                                                                {t('critical')}
+                                                            </div>
+                                                            <button
+                                                                onClick={() => handleToggleHealth(device)}
+                                                                className="text-[10px] font-bold text-[var(--soft-primary)] hover:underline"
+                                                            >
+                                                                Fix Manual
+                                                            </button>
+                                                        </div>
                                                     ) : (
-                                                        <span className="badge-soft !bg-emerald-50 !text-emerald-600 flex items-center gap-1">
-                                                            <CheckCircle2 size={10} />
-                                                            {t('healthy')}
-                                                        </span>
+                                                        <div className="flex flex-col items-center gap-1">
+                                                            <div className="badge-soft !bg-emerald-50 !text-emerald-600 flex items-center gap-1">
+                                                                <CheckCircle2 size={10} />
+                                                                {t('healthy')}
+                                                            </div>
+                                                            <button
+                                                                onClick={() => handleToggleHealth(device)}
+                                                                className="text-[10px] font-bold text-red-500 hover:underline"
+                                                            >
+                                                                Force Alert
+                                                            </button>
+                                                        </div>
                                                     )}
                                                 </div>
+
 
                                                 {/* Actions */}
                                                 <div className="col-span-1 flex justify-end gap-2">
@@ -393,20 +428,24 @@ export default function DevicesPage() {
                                                         </p>
                                                     </div>
 
-                                                    <div className="flex items-end justify-between">
-                                                        <div>
-                                                            <p className="text-[10px] uppercase font-bold text-[var(--soft-text-sub)] tracking-wider">{t('current')}</p>
-                                                            <p className={`text-3xl font-bold leading-none ${(device.lastTempValue > device.tempMax || device.lastTempValue < device.tempMin) ? 'text-red-500' : 'text-[var(--soft-text-main)]'}`}>
-                                                                {device.lastTempValue?.toFixed(1)}°
-                                                            </p>
+                                                    <div className="flex flex-col items-end gap-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <button
+                                                                onClick={() => handleToggleHealth(device)}
+                                                                className={`p-2 rounded-lg transition-all ${device.healthStatus === 'NOT_HEALTHY' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}
+                                                                title={device.healthStatus === 'NOT_HEALTHY' ? "Set Healthy" : "Set Alert"}
+                                                            >
+                                                                {device.healthStatus === 'NOT_HEALTHY' ? <ShieldCheck size={14} /> : <AlertTriangle size={14} />}
+                                                            </button>
+                                                            <button onClick={() => openEdit(device)} className="btn-soft !px-3 !py-1.5 !text-xs !bg-white !text-slate-500 hover:!text-[var(--soft-primary)] shadow-sm">
+                                                                <Settings2 size={14} />
+                                                            </button>
+                                                            <button onClick={() => fetchLogs(device.id)} className="btn-soft !px-3 !py-1.5 !text-xs !bg-white !text-[var(--soft-primary)] hover:!bg-[var(--soft-primary)] hover:!text-white shadow-sm">
+                                                                {t('logs')}
+                                                            </button>
                                                         </div>
-                                                        <button onClick={() => openEdit(device)} className="btn-soft !px-3 !py-1.5 !text-xs !bg-white !text-slate-500 hover:!text-[var(--soft-primary)] shadow-sm">
-                                                            <Settings2 size={14} />
-                                                        </button>
-                                                        <button onClick={() => fetchLogs(device.id)} className="btn-soft !px-3 !py-1.5 !text-xs !bg-white !text-[var(--soft-primary)] hover:!bg-[var(--soft-primary)] hover:!text-white shadow-sm">
-                                                            {t('logs')}
-                                                        </button>
                                                     </div>
+
                                                 </div>
                                             </div>
                                         </div>

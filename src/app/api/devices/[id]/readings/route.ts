@@ -88,11 +88,17 @@ export async function POST(
         }
 
         step = 'logic_health_check';
-        // 2. Check Health Rules
-        const isHealthy = (
+        // 2. Check Health Rules (Temperature bounds)
+        const isTermperatureHealthy = (
             Number(temperature) >= (device.tempMin ?? -20) &&
             Number(temperature) <= (device.tempMax ?? 10)
         );
+
+        // If it was manually set to NOT_HEALTHY, it stays until reset
+        // Or if the temperature is currently out of bounds
+        const finalHealthStatus = (device.healthStatus === 'NOT_HEALTHY' || !isTermperatureHealthy)
+            ? 'NOT_HEALTHY'
+            : 'HEALTHY';
 
         step = 'db_create_reading';
         // 3. Save Reading using Internal UUID (device.id)
@@ -103,7 +109,7 @@ export async function POST(
                 humidity: Number(humidity),
                 latitude: lat ? Number(lat) : undefined,
                 longitude: lon ? Number(lon) : undefined,
-                healthStatus: isHealthy ? 'HEALTHY' : 'NOT_HEALTHY',
+                healthStatus: finalHealthStatus,
                 deviceTimestamp: new Date(),
             }
         });
@@ -118,12 +124,17 @@ export async function POST(
                 lastLatitude: lat ? Number(lat) : undefined,
                 lastLongitude: lon ? Number(lon) : undefined,
                 lastSeenAt: new Date(),
-                healthStatus: isHealthy ? 'HEALTHY' : 'NOT_HEALTHY',
+                healthStatus: finalHealthStatus,
                 isOnline: true
             }
         });
 
-        return NextResponse.json({ success: true, healthy: isHealthy, deviceId: id });
+        return NextResponse.json({
+            success: true,
+            healthy: finalHealthStatus === 'HEALTHY',
+            deviceId: id
+        });
+
 
     } catch (error: any) {
         console.error(`[API] Error at step '${step}':`, error);
