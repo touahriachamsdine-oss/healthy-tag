@@ -6,7 +6,7 @@ import { useSettings } from '@/context/SettingsContext';
 import {
     Search, Plus, Filter, List, Grid,
     Settings2, History, AlertTriangle,
-    CheckCircle2, X, Save,
+    CheckCircle2, X, Save, MoreVertical, Trash2,
     Smartphone, Server, ShieldCheck, MapPin, ChevronDown
 } from 'lucide-react';
 
@@ -30,6 +30,8 @@ export default function DevicesPage() {
     const [logs, setLogs] = useState<any[]>([]);
     const [isSaving, setIsSaving] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
     const [editValues, setEditValues] = useState({ targetTemp: 4, tempMin: 2, tempMax: 8 });
     const [pendingChanges, setPendingChanges] = useState<Record<string, { tempMin: number, tempMax: number }>>({});
 
@@ -106,6 +108,17 @@ export default function DevicesPage() {
             console.error('Toggle failed:', error);
         }
     };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this device? This will also remove all its telemetry data.')) return;
+        try {
+            const res = await fetch(`/api/devices/${id}`, { method: 'DELETE' });
+            if (res.ok) fetchData();
+        } catch (error) {
+            console.error('Delete failed:', error);
+        }
+    };
+
 
 
     const handleRegister = async (e: React.FormEvent) => {
@@ -385,7 +398,7 @@ export default function DevicesPage() {
 
 
                                                 {/* Actions */}
-                                                <div className="col-span-1 flex justify-end gap-2">
+                                                <div className="col-span-1 flex justify-end items-center gap-2 relative">
                                                     {pendingChanges[device.id] && (
                                                         <button
                                                             onClick={() => handleInlineSave(device.id)}
@@ -401,7 +414,37 @@ export default function DevicesPage() {
                                                     >
                                                         {t('logs')}
                                                     </button>
+
+                                                    <div className="relative">
+                                                        <button
+                                                            onClick={() => setActiveDropdown(activeDropdown === device.id ? null : device.id)}
+                                                            className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-400"
+                                                        >
+                                                            <MoreVertical size={18} />
+                                                        </button>
+
+                                                        {activeDropdown === device.id && (
+                                                            <>
+                                                                <div className="fixed inset-0 z-10" onClick={() => setActiveDropdown(null)}></div>
+                                                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 z-20 overflow-hidden py-1">
+                                                                    <button
+                                                                        onClick={() => { openEdit(device); setActiveDropdown(null); }}
+                                                                        className="w-full px-4 py-2.5 text-left text-sm font-bold text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                                                                    >
+                                                                        <Settings2 size={14} /> {t('edit')}
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => { handleDelete(device.id); setActiveDropdown(null); }}
+                                                                        className="w-full px-4 py-2.5 text-left text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2"
+                                                                    >
+                                                                        <Trash2 size={14} /> {t('delete')}
+                                                                    </button>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
+
                                             </div>
                                         ))}
                                     </div>
@@ -437,14 +480,41 @@ export default function DevicesPage() {
                                                             >
                                                                 {device.healthStatus === 'NOT_HEALTHY' ? <ShieldCheck size={14} /> : <AlertTriangle size={14} />}
                                                             </button>
-                                                            <button onClick={() => openEdit(device)} className="btn-soft !px-3 !py-1.5 !text-xs !bg-white !text-slate-500 hover:!text-[var(--soft-primary)] shadow-sm">
-                                                                <Settings2 size={14} />
-                                                            </button>
                                                             <button onClick={() => fetchLogs(device.id)} className="btn-soft !px-3 !py-1.5 !text-xs !bg-white !text-[var(--soft-primary)] hover:!bg-[var(--soft-primary)] hover:!text-white shadow-sm">
                                                                 {t('logs')}
                                                             </button>
+
+                                                            <div className="relative">
+                                                                <button
+                                                                    onClick={() => setActiveDropdown(activeDropdown === device.id ? null : device.id)}
+                                                                    className="p-1.5 hover:bg-white rounded-lg transition-colors text-slate-400 bg-white/50"
+                                                                >
+                                                                    <MoreVertical size={16} />
+                                                                </button>
+
+                                                                {activeDropdown === device.id && (
+                                                                    <>
+                                                                        <div className="fixed inset-0 z-10" onClick={() => setActiveDropdown(null)}></div>
+                                                                        <div className="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 z-20 overflow-hidden py-1">
+                                                                            <button
+                                                                                onClick={() => { openEdit(device); setActiveDropdown(null); }}
+                                                                                className="w-full px-4 py-2.5 text-left text-sm font-bold text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                                                                            >
+                                                                                <Settings2 size={14} /> {t('edit')}
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => { handleDelete(device.id); setActiveDropdown(null); }}
+                                                                                className="w-full px-4 py-2.5 text-left text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2"
+                                                                            >
+                                                                                <Trash2 size={14} /> {t('delete')}
+                                                                            </button>
+                                                                        </div>
+                                                                    </>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
+
 
                                                 </div>
                                             </div>
@@ -465,64 +535,67 @@ export default function DevicesPage() {
                             <h3 className="font-bold text-[var(--soft-text-main)] text-2xl !pl-6">{t('registerNewNode')}</h3>
                             <button onClick={() => setShowRegister(false)} className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-400 hover:text-red-500 transition-all"><X size={24} /></button>
                         </div>
-                        <form onSubmit={handleRegister} className="p-16 flex flex-col gap-10">
+                        <form onSubmit={handleRegister} className="p-12 flex flex-col gap-8">
 
-                            <div className="space-y-4">
-                                <label className="text-sm font-bold text-[var(--soft-text-sub)] uppercase tracking-wider pl-6">{t('identity')}</label>
-                                <input required type="text" placeholder={t('serialNumber')} className="w-full h-16 rounded-[20px] bg-[var(--soft-bg-inner)] border-none !pl-10 !pr-6 font-mono text-lg focus:ring-4 ring-[var(--soft-primary)]/20 transition-all outline-none text-[var(--soft-text-main)] placeholder:text-slate-300" value={newDevice.deviceId} onChange={e => setNewDevice({ ...newDevice, deviceId: e.target.value.toUpperCase() })} />
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t('identity')}</label>
+                                <input required type="text" placeholder={t('serialNumber')} className="w-full h-14 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-indigo-500/20 focus:bg-white outline-none px-6 font-mono text-lg transition-all" value={newDevice.deviceId} onChange={e => setNewDevice({ ...newDevice, deviceId: e.target.value.toUpperCase() })} />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-8">
-                                <div className="space-y-4">
-                                    <label className="text-sm font-bold text-[var(--soft-text-sub)] uppercase tracking-wider pl-6">{t('type')}</label>
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t('type')}</label>
                                     <div className="relative">
-                                        <select className="appearance-none w-full h-16 rounded-[20px] bg-[var(--soft-bg-inner)] border-none !pl-10 !pr-10 text-base font-bold text-[var(--soft-text-main)] outline-none focus:ring-4 ring-[var(--soft-primary)]/20 transition-all cursor-pointer" value={newDevice.type} onChange={e => setNewDevice({ ...newDevice, type: e.target.value })}>
+                                        <select className="appearance-none w-full h-14 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-indigo-500/20 focus:bg-white outline-none px-6 font-bold text-slate-700 transition-all cursor-pointer" value={newDevice.type} onChange={e => setNewDevice({ ...newDevice, type: e.target.value })}>
                                             <option value="FRIDGE">{t('fridge')}</option>
                                             <option value="FREEZER">{t('freezer')}</option>
                                         </select>
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-[var(--soft-text-sub)]">
-                                            <ChevronDown size={20} />
+                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                                            <ChevronDown size={18} />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="space-y-4">
-                                    <label className="text-sm font-bold text-[var(--soft-text-sub)] uppercase tracking-wider pl-6">{t('location')}</label>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t('location')}</label>
                                     <div className="relative">
-                                        <select required className="appearance-none w-full h-16 rounded-[20px] bg-[var(--soft-bg-inner)] border-none !pl-10 !pr-10 text-base font-bold text-[var(--soft-text-main)] outline-none focus:ring-4 ring-[var(--soft-primary)]/20 transition-all cursor-pointer" value={newDevice.facilityId} onChange={e => setNewDevice({ ...newDevice, facilityId: e.target.value })}>
+                                        <select required className="appearance-none w-full h-14 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-indigo-500/20 focus:bg-white outline-none px-6 font-bold text-slate-700 transition-all cursor-pointer" value={newDevice.facilityId} onChange={e => setNewDevice({ ...newDevice, facilityId: e.target.value })}>
                                             <option value="">{t('select')}</option>
                                             {facilities.map(f => (<option key={f.id} value={f.id}>{f.name}</option>))}
                                         </select>
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-[var(--soft-text-sub)]">
-                                            <ChevronDown size={20} />
+                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                                            <ChevronDown size={18} />
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="p-8 bg-[var(--soft-bg-inner)] rounded-[24px] space-y-6">
-                                <p className="text-sm font-bold text-[var(--soft-primary)] uppercase flex items-center gap-2 mb-2 pl-6">
-                                    <ShieldCheck size={18} /> {t('parameters')}
-                                </p>
-                                <div className="grid grid-cols-3 gap-6">
-                                    <div className="text-center space-y-2">
-                                        <label className="text-xs font-bold text-slate-400 block tracking-wider">{t('target')}</label>
-                                        <input type="number" className="w-full h-14 rounded-[16px] bg-white text-center font-bold text-[var(--soft-text-main)] text-xl shadow-sm focus:ring-4 ring-[var(--soft-primary)]/20 outline-none !px-4" value={newDevice.targetTemp} onChange={e => setNewDevice({ ...newDevice, targetTemp: parseFloat(e.target.value) })} />
+                            <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col gap-6">
+                                <div className="flex items-center gap-2 text-indigo-600">
+                                    <ShieldCheck size={18} />
+                                    <p className="text-xs font-black uppercase tracking-widest">{t('parameters')}</p>
+                                </div>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase text-center block">{t('target')}</label>
+                                        <input type="number" step="0.1" className="w-full h-12 rounded-xl bg-white text-center font-bold text-slate-700 border-2 border-transparent focus:border-indigo-500 transition-all outline-none" value={newDevice.targetTemp} onChange={e => setNewDevice({ ...newDevice, targetTemp: parseFloat(e.target.value) })} />
                                     </div>
-                                    <div className="text-center space-y-2">
-                                        <label className="text-xs font-bold text-slate-400 block tracking-wider">{t('min')}</label>
-                                        <input type="number" className="w-full h-14 rounded-[16px] bg-white text-center font-bold text-[var(--soft-text-main)] text-xl shadow-sm focus:ring-4 ring-[var(--soft-primary)]/20 outline-none !px-4" value={newDevice.tempMin} onChange={e => setNewDevice({ ...newDevice, tempMin: parseFloat(e.target.value) })} />
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase text-center block">{t('min')}</label>
+                                        <input type="number" step="0.1" className="w-full h-12 rounded-xl bg-white text-center font-bold text-slate-700 border-2 border-transparent focus:border-indigo-500 transition-all outline-none" value={newDevice.tempMin} onChange={e => setNewDevice({ ...newDevice, tempMin: parseFloat(e.target.value) })} />
                                     </div>
-                                    <div className="text-center space-y-2">
-                                        <label className="text-xs font-bold text-slate-400 block tracking-wider">{t('max')}</label>
-                                        <input type="number" className="w-full h-14 rounded-[16px] bg-white text-center font-bold text-[var(--soft-text-main)] text-xl shadow-sm focus:ring-4 ring-[var(--soft-primary)]/20 outline-none !px-4" value={newDevice.tempMax} onChange={e => setNewDevice({ ...newDevice, tempMax: parseFloat(e.target.value) })} />
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase text-center block">{t('max')}</label>
+                                        <input type="number" step="0.1" className="w-full h-12 rounded-xl bg-white text-center font-bold text-slate-700 border-2 border-transparent focus:border-indigo-500 transition-all outline-none" value={newDevice.tempMax} onChange={e => setNewDevice({ ...newDevice, tempMax: parseFloat(e.target.value) })} />
                                     </div>
                                 </div>
                             </div>
 
-                            <button type="submit" className="btn-soft w-full h-16 mt-4 text-lg font-bold shadow-xl shadow-indigo-200/50 hover:shadow-indigo-300 hover:-translate-y-1 transition-all">
-                                {t('addDevice')}
-                            </button>
+                            <div className="flex items-center gap-4 mt-2">
+                                <button type="button" onClick={() => setShowRegister(false)} className="flex-1 h-14 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all">Cancel</button>
+                                <button type="submit" className="flex-[2] h-14 rounded-2xl bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-200 hover:shadow-indigo-300 hover:-translate-y-0.5 transition-all">Register Device</button>
+                            </div>
                         </form>
+
                     </div>
                 </div>
             )}

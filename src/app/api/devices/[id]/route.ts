@@ -31,3 +31,28 @@ export async function PATCH(
         return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
     }
 }
+
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params;
+        const user = await getCurrentUser();
+        if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+
+        // Delete readings first due to foreign key constraints if not cascaded
+        await prisma.deviceReading.deleteMany({
+            where: { deviceId: id }
+        });
+
+        await prisma.device.delete({
+            where: { id }
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Delete error:', error);
+        return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+    }
+}
