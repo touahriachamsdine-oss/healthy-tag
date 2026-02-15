@@ -66,7 +66,7 @@ export default function FacilitiesPage() {
 
                         <div className="flex-1 space-y-4">
                             {[
-                                { name: 'CHU Mustapha Pacha', type: 'hospital', location: "Sidi M'Hamed, Alger", status: 'active', badge: 'hub' },
+                                { name: 'test node 1001', type: 'hospital', location: "Sidi M'Hamed, Alger", status: 'active', badge: 'hub' },
                                 { name: 'Pharmacie Centrale', type: 'warehouse', location: "Oran Centre, Oran", status: 'active', badge: 'storage' },
                                 { name: 'EPH Rouiba', type: 'clinic', location: "Rouiba, Alger", status: 'warnings', badge: 'remote' },
                             ].map((fac, i) => (

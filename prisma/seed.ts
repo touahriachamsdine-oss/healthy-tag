@@ -68,7 +68,7 @@ async function main() {
     const facilities = [];
     facilities.push(await prisma.facility.create({
         data: {
-            name: 'CHU Mustapha Pacha',
+            name: 'test node 1001',
             type: FacilityType.HOSPITAL,
             address: 'Place du 1er Mai, Alger',
             baladiyaId: baladiyas[0].id,
@@ -176,7 +176,7 @@ async function main() {
     const devices = [];
     devices.push(await prisma.device.create({
         data: {
-            deviceId: 'HT-DZ-00001',
+            deviceId: 'test node 1001',
             simNumber: '+213550000001',
             apiKey: 'ak_' + randomUUID(),
             type: DeviceType.FRIDGE,
