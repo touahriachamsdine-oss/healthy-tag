@@ -233,10 +233,10 @@ export default function DevicesPage() {
                 {/* HERO */}
                 <header className="flex flex-col gap-2 mb-8">
                     <h1 className="text-3xl font-bold text-[var(--soft-text-main)]">
-                        Fleet Intelligence
+                        {t('fleetIntelligence')}
                     </h1>
                     <p className="text-[var(--soft-text-sub)]">
-                        Manage {devices.length} active hardware nodes.
+                        {t('manage')} {devices.length} {t('activeHardwareCount')}.
                     </p>
                 </header>
 
@@ -317,7 +317,7 @@ export default function DevicesPage() {
 
                                                 {/* Location */}
                                                 <div className="col-span-3">
-                                                    <p className="font-bold text-[var(--soft-text-main)] text-sm truncate">{device.facility?.name || 'Unassigned'}</p>
+                                                    <p className="font-bold text-[var(--soft-text-main)] text-sm truncate">{device.facility?.name || t('unassigned')}</p>
                                                     <div className="flex items-center gap-1 text-[var(--soft-text-sub)] mt-0.5">
                                                         <MapPin size={10} />
                                                         <span className="text-[10px]">{device.wilaya?.name}</span>
@@ -377,7 +377,7 @@ export default function DevicesPage() {
                                                                 onClick={() => handleToggleHealth(device)}
                                                                 className="text-[10px] font-bold text-[var(--soft-primary)] hover:underline"
                                                             >
-                                                                Fix Manual
+                                                                {t('fixManual')}
                                                             </button>
                                                         </div>
                                                     ) : (
@@ -390,7 +390,7 @@ export default function DevicesPage() {
                                                                 onClick={() => handleToggleHealth(device)}
                                                                 className="text-[10px] font-bold text-red-500 hover:underline"
                                                             >
-                                                                Force Alert
+                                                                {t('forceAlert')}
                                                             </button>
                                                         </div>
                                                     )}
@@ -591,8 +591,8 @@ export default function DevicesPage() {
                             </div>
 
                             <div className="flex items-center gap-4 mt-2">
-                                <button type="button" onClick={() => setShowRegister(false)} className="flex-1 h-14 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all">Cancel</button>
-                                <button type="submit" className="flex-[2] h-14 rounded-2xl bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-200 hover:shadow-indigo-300 hover:-translate-y-0.5 transition-all">Register Device</button>
+                                <button type="button" onClick={() => setShowRegister(false)} className="flex-1 h-14 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all">{t('cancel')}</button>
+                                <button type="submit" className="flex-[2] h-14 rounded-2xl bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-200 hover:shadow-indigo-300 hover:-translate-y-0.5 transition-all">{t('registerNewNode')}</button>
                             </div>
                         </form>
 
@@ -607,7 +607,7 @@ export default function DevicesPage() {
                     <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-2xl h-[80vh] overflow-hidden flex flex-col">
                         <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
                             <div>
-                                <h3 className="font-bold text-[var(--soft-text-main)] text-xl">Telemetry Logs</h3>
+                                <h3 className="font-bold text-[var(--soft-text-main)] text-xl">{t('telemetryLogs')}</h3>
                                 <p className="text-xs text-slate-400 font-mono">{selectedDevice?.deviceId}</p>
                             </div>
                             <button onClick={() => setShowLogs(false)} className="text-slate-400 hover:text-red-500"><X size={24} /></button>
@@ -615,7 +615,7 @@ export default function DevicesPage() {
                         <div className="flex-1 overflow-y-auto p-8">
                             <div className="space-y-4">
                                 {logs.length === 0 ? (
-                                    <div className="text-center py-20 text-slate-400">No logs found for this period.</div>
+                                    <div className="text-center py-20 text-slate-400">{t('noLogsFound')}</div>
                                 ) : (
                                     logs.map((log: any, idx: number) => (
                                         <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">

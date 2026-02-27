@@ -38,9 +38,9 @@ export default function ReportsPage() {
     if (isLoading && !user) return <div className="min-h-screen bg-[var(--bg-body)] flex items-center justify-center"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>;
 
     const reportTypes = [
-        { title: 'Temperature Compliance', icon: PieChart, desc: 'Detailed analysis of temperature maintenance across units.', key: 'temp_compliance' },
-        { title: 'Alarm History', icon: FileText, desc: 'Complete log of all high and low temperature excursions.', key: 'alarm_history' },
-        { title: 'Asset Inventory', icon: FileSpreadsheet, desc: 'Summary of all registered monitoring hardware and locations.', key: 'asset_inventory' },
+        { title: t('tempCompliance'), icon: PieChart, desc: 'Detailed analysis of temperature maintenance across units.', key: 'temp_compliance' },
+        { title: t('alarmHistory'), icon: FileText, desc: 'Complete log of all high and low temperature excursions.', key: 'alarm_history' },
+        { title: t('assetInventory'), icon: FileSpreadsheet, desc: 'Summary of all registered monitoring hardware and locations.', key: 'asset_inventory' },
     ];
 
     return (
@@ -78,7 +78,7 @@ export default function ReportsPage() {
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
                             <div className="w-1.5 h-8 bg-emerald-500 rounded-full" />
-                            <h2 className="text-2xl font-bold text-[var(--soft-text-main)]">Asset Inventory Status</h2>
+                            <h2 className="text-2xl font-bold text-[var(--soft-text-main)]">{t('assetInventoryStatus')}</h2>
                         </div>
                     </div>
 
@@ -86,11 +86,11 @@ export default function ReportsPage() {
                         <table className="w-full text-left border-separate border-spacing-y-3">
                             <thead>
                                 <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                    <th className="px-6 pb-2">Device ID</th>
-                                    <th className="px-6 pb-2">Facility</th>
-                                    <th className="px-6 pb-2">Wilaya</th>
-                                    <th className="px-6 pb-2">Status</th>
-                                    <th className="px-6 pb-2">Last Updated</th>
+                                    <th className="px-6 pb-2">{t('deviceId')}</th>
+                                    <th className="px-6 pb-2">{t('facility')}</th>
+                                    <th className="px-6 pb-2">{t('wilaya')}</th>
+                                    <th className="px-6 pb-2">{t('status')}</th>
+                                    <th className="px-6 pb-2">{t('lastUpdated')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -105,7 +105,7 @@ export default function ReportsPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 rounded-r-2xl border border-l-0 border-transparent group-hover:border-indigo-50 text-xs text-slate-400">
-                                            {device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleString() : 'Never'}
+                                            {device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleString() : t('never')}
                                         </td>
                                     </tr>
                                 ))}

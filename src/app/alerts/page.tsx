@@ -72,7 +72,7 @@ export default function AlertsPage() {
                         {t('systemNotifications')}
                     </h1>
                     <p className="text-[var(--soft-text-sub)] font-medium">
-                        Live monitoring events and hardware exceptions.
+                        {t('dashboardWelcome')}
                     </p>
                 </header>
 
@@ -121,13 +121,13 @@ export default function AlertsPage() {
                                                                     onClick={() => handleAction(alert.id, 'acknowledge')}
                                                                     className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-all"
                                                                 >
-                                                                    Acknowledge
+                                                                    {t('acknowledge')}
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleAction(alert.id, 'resolve')}
                                                                     className="text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition-all"
                                                                 >
-                                                                    Resolve
+                                                                    {t('resolve')}
                                                                 </button>
                                                             </div>
                                                         )}
@@ -141,8 +141,8 @@ export default function AlertsPage() {
                                         <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 mb-4">
                                             <CheckCircle2 size={32} />
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-800">No active alerts</h3>
-                                        <p className="text-sm text-slate-400 max-w-xs mx-auto mt-1">All monitoring nodes are operating within normal environmental parameters.</p>
+                                        <h3 className="text-lg font-bold text-slate-800">{t('noActiveAlerts')}</h3>
+                                        <p className="text-sm text-slate-400 max-w-xs mx-auto mt-1">{t('monitoringNodesNormal')}</p>
                                     </div>
                                 )}
                             </div>

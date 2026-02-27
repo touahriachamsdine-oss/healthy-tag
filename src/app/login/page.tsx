@@ -30,14 +30,14 @@ export default function LoginPage() {
                 if (data.success) {
                     router.push('/dashboard');
                 } else {
-                    setError(data.error || 'Invalid credentials');
+                    setError(data.error || t('invalidCredentials'));
                 }
             } else {
                 const data = await response.json().catch(() => ({}));
-                setError(data.error || 'Identity verification failed');
+                setError(data.error || t('invalidCredentials'));
             }
         } catch (err: any) {
-            setError('System communication error');
+            setError(t('systemError'));
         } finally {
             setIsLoading(false);
         }

@@ -172,7 +172,7 @@ export default function UsersPage() {
                                                 </span>
                                                 <div className="flex items-center gap-1 text-[10px] font-bold text-[var(--soft-text-sub)]">
                                                     <MapPin size={10} />
-                                                    {u.wilaya?.name || 'National Scope'}
+                                                    {u.wilaya?.name || t('nationalScope')}
                                                 </div>
                                             </div>
                                         </div>
@@ -247,7 +247,7 @@ export default function UsersPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-[var(--soft-text-sub)] uppercase tracking-widest px-1">Role</label>
+                                    <label className="text-[10px] font-black text-[var(--soft-text-sub)] uppercase tracking-widest px-1">{t('role')}</label>
                                     <div className="relative">
                                         <select className="appearance-none w-full h-12 bg-[var(--soft-bg-inner)] rounded-2xl px-5 text-sm font-bold text-[var(--soft-text-main)] outline-none cursor-pointer" value={newUser.role} onChange={e => setNewUser({ ...newUser, role: e.target.value as any })}>
                                             <option value="WILAYA_ADMIN">{t('regionalAdmin')}</option>

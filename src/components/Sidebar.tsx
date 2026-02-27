@@ -146,7 +146,7 @@ export default function Sidebar({ userRole, userName, scopeName, isEmbedded = fa
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-bold text-[var(--soft-text-main)] truncate leading-none mb-1">{userName || 'User'}</p>
-                            <p className="text-[11px] font-medium text-[var(--soft-text-sub)] truncate uppercase tracking-tighter opacity-80">{userRole || 'Administrator'}</p>
+                            <p className="text-[11px] font-medium text-[var(--soft-text-sub)] truncate uppercase tracking-tighter opacity-80">{userRole || t('admin')}</p>
                         </div>
                         <button
                             onClick={handleLogout}

@@ -173,8 +173,8 @@ export default function DashboardPage() {
                                         <div className="w-12 h-12 rounded-full border-2 border-dashed border-[var(--border-subtle)] flex items-center justify-center mb-4">
                                             <CheckCircle size={20} className="text-emerald-500" />
                                         </div>
-                                        <p className="text-sm font-bold">All systems healthy</p>
-                                        <p className="text-[10px] uppercase tracking-widest mt-1">No recent alerts</p>
+                                        <p className="text-sm font-bold">{t('allSystemsHealthy')}</p>
+                                        <p className="text-[10px] uppercase tracking-widest mt-1">{t('noRecentAlerts')}</p>
                                     </div>
                                 )}
                             </div>
