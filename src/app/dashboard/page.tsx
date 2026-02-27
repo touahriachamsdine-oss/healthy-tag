@@ -61,18 +61,24 @@ export default function DashboardPage() {
                 {/* STATS GRID */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {[
-                        { label: t('activeUnits'), value: (stats?.healthyDevices || 0) + (stats?.warningDevices || 0), icon: Activity, badge: t('live'), color: 'indigo' },
-                        { label: t('totalDevices'), value: stats?.totalDevices || 0, icon: Thermometer, badge: t('total'), color: 'slate' },
-                        { label: t('critical'), value: stats?.unhealthyDevices || 0, icon: Zap, badge: t('actionReq'), color: 'rose', highlight: true },
-                        { label: t('warnings'), value: stats?.warningDevices || 0, icon: Wind, badge: t('warnings'), color: 'amber' },
+                        { label: t('activeUnits'), value: (stats?.healthyDevices || 0) + (stats?.warningDevices || 0), icon: Activity, badge: t('live'), color: 'var(--soft-primary)' },
+                        { label: t('totalDevices'), value: stats?.totalDevices || 0, icon: Thermometer, badge: t('total'), color: 'var(--soft-text-muted)' },
+                        { label: t('critical'), value: stats?.unhealthyDevices || 0, icon: Zap, badge: t('actionReq'), color: 'var(--soft-error)', highlight: true },
+                        { label: t('warnings'), value: stats?.warningDevices || 0, icon: Wind, badge: t('warnings'), color: 'var(--soft-warning)' },
                     ].map((stat, i) => (
                         <div key={i} className="card-soft group cursor-default">
                             <div className="flex flex-col gap-5 h-full relative z-10 transition-transform duration-300 group-hover:scale-[1.02]">
                                 <div className="flex items-center justify-between">
-                                    <div className={`icon-soft !w-12 !h-12 !rounded-2xl transition-colors duration-300 ${stat.highlight ? '!bg-rose-50 !text-rose-600' : ''}`}>
+                                    <div
+                                        className="icon-soft !w-12 !h-12 !rounded-2xl transition-colors duration-300"
+                                        style={{ backgroundColor: stat.highlight ? 'rgba(239, 68, 68, 0.1)' : 'var(--soft-primary-light)', color: stat.color }}
+                                    >
                                         <stat.icon size={24} />
                                     </div>
-                                    <span className={`badge-soft font-bold text-[10px] ${stat.highlight ? '!bg-rose-100 !text-rose-600 !border-rose-200' : ''}`}>
+                                    <span
+                                        className="badge-soft font-bold text-[10px]"
+                                        style={{ borderColor: stat.highlight ? 'rgba(239, 68, 68, 0.2)' : 'var(--border-subtle)', color: stat.color, backgroundColor: stat.highlight ? 'rgba(239, 68, 68, 0.05)' : 'var(--soft-bg-badge)' }}
+                                    >
                                         {stat.badge}
                                     </span>
                                 </div>
@@ -92,7 +98,7 @@ export default function DashboardPage() {
                                 </div>
                             </div>
                             {/* Decorative background shape */}
-                            <div className={`absolute -right-4 -bottom-4 w-24 h-24 rounded-full opacity-[0.03] transition-transform duration-500 group-hover:scale-150 ${stat.highlight ? 'bg-rose-600' : 'bg-indigo-600'}`} />
+                            <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full opacity-[0.03] transition-transform duration-500 group-hover:scale-150" style={{ backgroundColor: stat.color }} />
                         </div>
                     ))}
                 </div>
@@ -100,10 +106,10 @@ export default function DashboardPage() {
                 {/* ANALYTICS SECTION */}
                 <div className="grid lg:grid-cols-12 gap-8 mt-12">
                     {/* Compliance Card */}
-                    <div className="lg:col-span-8 card-soft !p-1 bg-gradient-to-br from-[var(--soft-primary)] via-indigo-600 to-indigo-800">
+                    <div className="lg:col-span-8 card-soft !p-1 bg-gradient-to-br from-[var(--soft-primary)] to-indigo-900">
                         <div className="bg-[var(--soft-bg-card)] rounded-[var(--radius-inner)] h-full p-10 flex flex-col items-center justify-center text-center relative overflow-hidden">
                             <div className="relative z-10">
-                                <span className="bg-indigo-50 text-indigo-600 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest border border-indigo-100 mb-8 inline-block shadow-sm">
+                                <span className="bg-[var(--soft-primary-light)] text-[var(--soft-primary)] px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest border border-[var(--soft-primary)]/10 mb-8 inline-block shadow-sm">
                                     {t('complianceRate')}
                                 </span>
                                 <div className="text-[120px] font-black text-transparent bg-clip-text bg-gradient-to-b from-[var(--soft-text-main)] to-[var(--soft-text-sub)] leading-none mb-6 tracking-tighter">
@@ -122,7 +128,7 @@ export default function DashboardPage() {
                             </div>
 
                             {/* Background Elements */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[200px] font-black opacity-[0.02] pointer-events-none select-none">
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[200px] font-black opacity-[0.01] pointer-events-none select-none text-[var(--soft-text-main)]">
                                 {stats?.complianceRate || 98}%
                             </div>
                         </div>
@@ -145,7 +151,10 @@ export default function DashboardPage() {
                                 {stats?.recentAlerts?.length > 0 ? (
                                     stats.recentAlerts.map((alert: any, i: number) => (
                                         <div key={alert.id} className="flex items-start gap-4 group p-1 rounded-xl transition-all">
-                                            <div className={`icon-soft !w-10 !h-10 transition-transform duration-300 group-hover:scale-110 shadow-sm ${alert.severity === 'CRITICAL' ? '!bg-rose-50 !text-rose-600' : '!bg-amber-50 !text-amber-600'}`}>
+                                            <div
+                                                className="icon-soft !w-10 !h-10 transition-transform duration-300 group-hover:scale-110 shadow-sm"
+                                                style={{ backgroundColor: alert.severity === 'CRITICAL' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: alert.severity === 'CRITICAL' ? 'var(--soft-error)' : 'var(--soft-warning)' }}
+                                            >
                                                 <TrendingUp size={18} />
                                             </div>
                                             <div className="flex-1 border-b border-[var(--border-subtle)] pb-4 group-last:border-0">
@@ -155,24 +164,23 @@ export default function DashboardPage() {
                                                         {new Date(alert.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                     </span>
                                                 </div>
-                                                <p className="text-xs font-bold text-[var(--soft-text-sub)] opacity-80 uppercase tracking-tight">NODE {alert.device?.deviceId} • {alert.type}</p>
+                                                <p className="text-[10px] font-bold text-[var(--soft-text-sub)] opacity-80 uppercase tracking-tight">NODE {alert.device?.deviceId} • {alert.type}</p>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
                                     <div className="flex flex-col items-center justify-center h-48 text-center text-[var(--soft-text-muted)]">
-                                        <div className="w-12 h-12 rounded-full border-2 border-dashed border-slate-200 flex items-center justify-center mb-4">
+                                        <div className="w-12 h-12 rounded-full border-2 border-dashed border-[var(--border-subtle)] flex items-center justify-center mb-4">
                                             <CheckCircle size={20} className="text-emerald-500" />
                                         </div>
-                                        <p className="text-sm font-bold">{t('allSystemsNormal') || 'All systems healthy'}</p>
+                                        <p className="text-sm font-bold">All systems healthy</p>
                                         <p className="text-[10px] uppercase tracking-widest mt-1">No recent alerts</p>
                                     </div>
                                 )}
                             </div>
 
-
                             <div className="mt-8">
-                                <Link href="/alerts" className="btn-soft !bg-[var(--soft-bg-card)] !text-indigo-600 border border-indigo-100 hover:!bg-indigo-50 w-full">
+                                <Link href="/alerts" className="btn-soft !bg-transparent border border-[var(--border-subtle)] !text-[var(--soft-text-main)] hover:!bg-[var(--soft-bg-card)] w-full">
                                     {t('viewAllHistory')}
                                 </Link>
                             </div>

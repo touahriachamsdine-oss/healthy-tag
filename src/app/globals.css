@@ -88,6 +88,27 @@
   --shadow-soft: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
 }
 
+/* NIGHT MODE - Pure OLED Black */
+[data-theme='night'] {
+  --soft-primary: #6366f1;
+  --soft-primary-hover: #818cf8;
+  --soft-primary-light: rgba(99, 102, 241, 0.15);
+
+  --soft-text-main: #ffffff;
+  --soft-text-sub: #94a3b8;
+  --soft-text-muted: #475569;
+
+  --soft-bg-card: #000000;
+  --soft-bg-inner: #0a0a0a;
+  --soft-bg-badge: #1e1e1e;
+  --soft-icon-bg: #1e1e1e;
+
+  --bg-body: #000000;
+  --border-subtle: #1e293b;
+
+  --shadow-soft: 0 0 0 1px #1e293b;
+}
+
 /* --- BASE STYLES --- */
 * {
   box-sizing: border-box;
@@ -114,6 +135,7 @@ body {
   transition: var(--transition-standard);
   position: relative;
   overflow: hidden;
+  color: var(--soft-text-main);
 }
 
 .card-soft:hover {

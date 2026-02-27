@@ -51,7 +51,6 @@ export default function Sidebar({ userRole, userName, scopeName, isEmbedded = fa
         { id: 'map', icon: MapIcon, path: '/map', label: t('map') },
         { id: 'alerts', icon: Bell, path: '/alerts', label: t('alerts') },
         { id: 'reports', icon: FileText, path: '/reports', label: t('reports') },
-        { id: 'facilities', icon: Building2, path: '/facilities', label: t('facilities') },
         ...(userRole === 'SUPER_ADMIN' ? [{ id: 'users', icon: Users, path: '/users', label: t('users') }] : []),
         { id: 'settings', icon: Settings, path: '/settings', label: t('settings') },
     ];
@@ -118,12 +117,15 @@ export default function Sidebar({ userRole, userName, scopeName, isEmbedded = fa
                     {/* Quick Settings Row */}
                     <div className="grid grid-cols-2 gap-3">
                         {/* Theme Toggle */}
-                        <div className="flex bg-[var(--soft-bg-card)] rounded-[var(--radius-btn)] p-1 shadow-sm border border-[var(--border-subtle)]">
-                            <button onClick={() => setTheme('light')} className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-all ${theme !== 'dark' && theme !== 'night' ? 'bg-[var(--soft-bg-inner)] text-[var(--soft-primary)] shadow-sm' : 'text-[var(--soft-text-muted)] hover:text-[var(--soft-text-main)]'}`}>
-                                <Sun size={16} />
+                        <div className="col-span-1 flex bg-[var(--soft-bg-card)] rounded-[var(--radius-btn)] p-1 shadow-sm border border-[var(--border-subtle)]">
+                            <button onClick={() => setTheme('light')} className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-all ${theme === 'light' ? 'bg-[var(--soft-bg-inner)] text-[var(--soft-primary)] shadow-sm' : 'text-[var(--soft-text-muted)] hover:text-[var(--soft-text-main)]'}`}>
+                                <Sun size={14} />
                             </button>
                             <button onClick={() => setTheme('dark')} className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-all ${theme === 'dark' ? 'bg-[var(--soft-bg-inner)] text-[var(--soft-primary)] shadow-sm' : 'text-[var(--soft-text-muted)] hover:text-[var(--soft-text-main)]'}`}>
-                                <Moon size={16} />
+                                <Moon size={14} />
+                            </button>
+                            <button onClick={() => setTheme('night')} className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-all ${theme === 'night' ? 'bg-[var(--soft-bg-inner)] text-[var(--soft-primary)] shadow-sm' : 'text-[var(--soft-text-muted)] hover:text-[var(--soft-text-main)]'}`}>
+                                <Shield size={14} />
                             </button>
                         </div>
 
@@ -148,7 +150,7 @@ export default function Sidebar({ userRole, userName, scopeName, isEmbedded = fa
                         </div>
                         <button
                             onClick={handleLogout}
-                            className="p-2 text-[var(--soft-text-muted)] hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            className="p-2 text-[var(--soft-text-muted)] hover:text-red-500 hover:bg-rose-500/10 rounded-lg transition-all"
                         >
                             <LogOut size={18} />
                         </button>
