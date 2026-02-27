@@ -169,9 +169,47 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // AI Analytics logic (simplified here for brevity, keeping original logic structure)
-        if (device.readings.length % 10 === 0 && device.readings.length >= 20) {
-            // ... (AI logic remains same as original script)
+        // AI Analytics logic - Runs periodically to detect failures and patterns
+        if (device.readings.length >= 20) {
+            const currentReading = {
+                temperature: payload.temp,
+                humidity: payload.humidity,
+                timestamp: new Date()
+            };
+            const historicalReadings = device.readings.map(r => ({
+                temperature: r.temperature,
+                humidity: r.humidity,
+                timestamp: r.serverTimestamp
+            }));
+
+            const anomalies = detectAnomalies(currentReading, historicalReadings, device.type);
+            const prediction = predictFailure(historicalReadings, device.type, 30); // Assume 30 days age if not tracked
+
+            if (anomalies.isAnomaly || prediction.predictedFailure) {
+                await prisma.aIAnalytics.create({
+                    data: {
+                        deviceId: device.id,
+                        anomalyScore: anomalies.score,
+                        anomalyType: anomalies.type,
+                        predictedFailure: prediction.predictedFailure,
+                        failureProbability: prediction.failureProbability,
+                        failureType: prediction.failureType,
+                        predictedTimeToFailure: prediction.timeToFailure,
+                        recommendation: prediction.recommendations.join(', '),
+                    }
+                });
+
+                // If high probability of failure, create a preventative alert
+                if (prediction.failureProbability > 0.8) {
+                    await createAlert(
+                        device.id,
+                        'COMPRESSOR_ISSUE',
+                        'HIGH',
+                        'AI Prediction: Potential Failure',
+                        `Advanced analytics predicts a possible ${prediction.failureType} failure within ${prediction.timeToFailure} hours.`
+                    );
+                }
+            }
         }
 
         // Return status for device display

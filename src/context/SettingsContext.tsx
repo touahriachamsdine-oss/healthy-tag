@@ -436,29 +436,32 @@ const translations: Record<Language, Record<string, string>> = {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-    const [language, setLanguage] = useState<Language>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('lang') as Language;
-            return saved && ['en', 'fr', 'ar'].includes(saved) ? saved : 'en';
+    const [language, setLanguage] = useState<Language>('en');
+    const [theme, setTheme] = useState<Theme>('dark');
+    const [mounted, setMounted] = useState(false);
+
+    // Initialize from localStorage on mount
+    useEffect(() => {
+        const savedLang = localStorage.getItem('lang') as Language;
+        if (savedLang && ['en', 'fr', 'ar'].includes(savedLang)) {
+            setLanguage(savedLang);
         }
-        return 'en';
-    });
-    const [theme, setTheme] = useState<Theme>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('theme') as Theme;
-            return saved && ['light', 'dark', 'night'].includes(saved) ? saved : 'dark';
+        const savedTheme = localStorage.getItem('theme') as Theme;
+        if (savedTheme && ['light', 'dark', 'night'].includes(savedTheme)) {
+            setTheme(savedTheme);
         }
-        return 'dark';
-    });
+        setMounted(true);
+    }, []);
 
     // Apply theme and direction
     useEffect(() => {
+        if (!mounted) return;
         document.documentElement.setAttribute('data-theme', theme);
         document.documentElement.setAttribute('dir', language === 'ar' ? 'rtl' : 'ltr');
         document.documentElement.setAttribute('lang', language);
         localStorage.setItem('lang', language);
         localStorage.setItem('theme', theme);
-    }, [language, theme]);
+    }, [language, theme, mounted]);
 
     const t = (key: string) => translations[language][key] || key;
 

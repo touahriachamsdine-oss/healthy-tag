@@ -47,13 +47,12 @@ export default function Sidebar({ userRole, userName, scopeName, isEmbedded = fa
 
     const menuItems = [
         { id: 'dashboard', icon: LayoutDashboard, path: '/dashboard', label: t('dashboard') },
-        { id: 'sensors', icon: Activity, path: '/sensors', label: t('sensors') },
         { id: 'devices', icon: Thermometer, path: '/devices', label: t('devices') },
         { id: 'map', icon: MapIcon, path: '/map', label: t('map') },
         { id: 'alerts', icon: Bell, path: '/alerts', label: t('alerts') },
         { id: 'reports', icon: FileText, path: '/reports', label: t('reports') },
         { id: 'facilities', icon: Building2, path: '/facilities', label: t('facilities') },
-        { id: 'users', icon: Users, path: '/users', label: t('users') },
+        ...(userRole === 'SUPER_ADMIN' ? [{ id: 'users', icon: Users, path: '/users', label: t('users') }] : []),
         { id: 'settings', icon: Settings, path: '/settings', label: t('settings') },
     ];
 

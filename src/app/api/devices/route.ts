@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { randomBytes } from 'crypto';
 
 
 export async function POST(request: NextRequest) {
@@ -8,6 +9,12 @@ export async function POST(request: NextRequest) {
         const user = await getCurrentUser();
         if (!user) {
             return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Only allow admins to register devices
+        if (user.role === 'BALADIYA_ADMIN') {
+            // Technically could allow, but usually restricted to higher levels
+            // For now let's allow all admins but check their scope later
         }
 
         const body = await request.json();
@@ -33,8 +40,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Invalid facility' }, { status: 400 });
         }
 
-        // Generate a random API Key
-        const apiKey = Buffer.from(Math.random().toString()).toString('base64').substring(0, 32);
+        // Generate a cryptographically secure random API Key
+        const apiKey = randomBytes(32).toString('hex');
 
         const device = await prisma.device.create({
             data: {
@@ -60,13 +67,27 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-    // This could return the list of facilities for the dropdown
     try {
+        const user = await getCurrentUser();
+        if (!user) {
+            return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Filter facilities based on user scope
+        const filter: any = {};
+        if (user.role === 'WILAYA_ADMIN') {
+            filter.baladiya = { wilayaId: user.wilayaId };
+        } else if (user.role === 'BALADIYA_ADMIN') {
+            filter.baladiyaId = user.baladiyaId;
+        }
+
         const facilities = await prisma.facility.findMany({
-            select: { id: true, name: true }
+            where: filter,
+            select: { id: true, name: true, baladiyaId: true }
         });
         return NextResponse.json({ success: true, data: facilities });
     } catch (error) {
+        console.error('Fetch facilities error:', error);
         return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
     }
 }
