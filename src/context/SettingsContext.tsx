@@ -130,7 +130,13 @@ const translations: Record<Language, Record<string, string>> = {
         never: 'Never',
         deviceId: 'Device ID',
         facility: 'Facility',
-        wilaya: 'Wilaya'
+        wilaya: 'Wilaya',
+        networkStatus: 'Network Status',
+        liveGPSFeed: 'Live GPS Feed',
+        deviation: 'Deviation',
+        unsafe: 'Unsafe',
+        offlineNoData: 'Offline / No Data',
+        mapLegendInfo: 'Real-time telemetry update frequency: 15min. Click markers for detailed drill-down.'
     },
     fr: {
         dashboard: 'Tableau de bord',
@@ -248,7 +254,13 @@ const translations: Record<Language, Record<string, string>> = {
         never: 'Jamais',
         deviceId: 'ID de l\'Appareil',
         facility: 'Installation',
-        wilaya: 'Wilaya'
+        wilaya: 'Wilaya',
+        networkStatus: 'Statut du Réseau',
+        liveGPSFeed: 'Flux GPS en direct',
+        deviation: 'Déviation',
+        unsafe: 'Non Sécurisé',
+        offlineNoData: 'Hors ligne / Aucune donnée',
+        mapLegendInfo: 'Fréquence de mise à jour de la télémétrie en temps réel : 15 min. Cliquez sur les marqueurs pour un examen détaillé.'
     },
     ar: {
         dashboard: 'الرئيسية',
@@ -365,8 +377,14 @@ const translations: Record<Language, Record<string, string>> = {
         assetInventoryStatus: 'حالة جرد الأصول',
         never: 'مطلقاً',
         deviceId: 'معرف الجهاز',
-        facility: 'المرفق',
-        wilaya: 'الولاية'
+        facility: 'المرفق الصحي',
+        wilaya: 'الولاية',
+        networkStatus: 'حالة الشبكة الجغرافية',
+        liveGPSFeed: 'بث GPS مباشر',
+        deviation: 'انحراف حراري',
+        unsafe: 'غير آمن',
+        offlineNoData: 'خارج الخدمة / لا توجد بيانات',
+        mapLegendInfo: 'تردد تحديث القياسات المباشر: كل 15 دقيقة. اضغط على العلامات للحصول على تفاصيل دقيقة.'
     }
 };
 

@@ -13,34 +13,35 @@ import { Row } from '@/components/layout/Row';
 
 // Legend Component
 function MapLegend() {
+    const { t } = useSettings();
     return (
-        <div className="absolute bottom-6 left-6 z-[1000] bg-[var(--bg-surface)]/90 backdrop-blur-md p-4 rounded-[var(--radius-lg)] border border-[var(--border-color)] shadow-xl w-64">
-            <h4 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Layers size={14} className="text-blue-500" /> Network Status
+        <div className="absolute bottom-6 left-6 z-[1000] bg-[var(--soft-bg-card)]/90 backdrop-blur-md p-4 rounded-[var(--radius-outer)] border border-[var(--border-subtle)] shadow-xl w-64">
+            <h4 className="text-[10px] font-black text-[var(--soft-text-main)] uppercase tracking-[0.1em] mb-4 flex items-center gap-2">
+                <Layers size={14} className="text-indigo-600" /> {t('networkStatus')}
             </h4>
-            <div className="space-y-2.5">
+            <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-[var(--text-secondary)]">Healthy (<span className="text-emerald-500 font-bold">2°C-8°C</span>)</span>
+                    <span className="text-xs font-bold text-[var(--soft-text-sub)]">{t('healthy')} (<span className="text-emerald-500">2°C-8°C</span>)</span>
                     <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-[var(--text-secondary)]">Warning (Deviation)</span>
+                    <span className="text-xs font-bold text-[var(--soft-text-sub)]">{t('warnings')} ({t('deviation')})</span>
                     <span className="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]"></span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-[var(--text-secondary)]">Critical (Unsafe)</span>
-                    <span className="w-3 h-3 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.4)]"></span>
+                    <span className="text-xs font-bold text-[var(--soft-text-sub)]">{t('critical')} ({t('unsafe')})</span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]"></span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-[var(--text-secondary)]">Offline/No Data</span>
-                    <span className="w-3 h-3 rounded-full bg-slate-400"></span>
+                    <span className="text-xs font-bold text-[var(--soft-text-sub)]">{t('offlineNoData')}</span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
                 </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-[var(--border-color)]">
-                <div className="flex items-start gap-2 text-[10px] text-[var(--text-muted)] leading-relaxed">
-                    <Info size={12} className="shrink-0 mt-0.5" />
-                    <span>Real-time telemetry update frequency: 15min. Click markers for detailed drill-down.</span>
+            <div className="mt-5 pt-3 border-t border-[var(--border-subtle)]">
+                <div className="flex items-start gap-2 text-[10px] text-[var(--soft-text-muted)] leading-relaxed font-medium">
+                    <Info size={12} className="shrink-0 mt-0.5 text-indigo-400" />
+                    <span>{t('mapLegendInfo')}</span>
                 </div>
             </div>
         </div>
@@ -89,28 +90,30 @@ export default function MapPage() {
         <AppShell user={user}>
             <div className="flex flex-col h-[calc(100vh-theme(spacing.8))] gap-[var(--space-6)]">
                 {/* Header */}
-                <Row justify="between" align="center" className="shrink-0">
+                <Row justify="between" align="center" className="shrink-0 mb-4">
                     <Row gap={4}>
-                        <Link href="/dashboard" className="w-10 h-10 flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-body)] transition-all">
+                        <Link href="/dashboard" className="w-12 h-12 flex items-center justify-center rounded-2xl bg-[var(--soft-bg-card)] border border-[var(--border-subtle)] text-[var(--soft-text-sub)] hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm">
                             <ArrowLeft size={20} />
                         </Link>
                         <div>
-                            <h2 className="text-2xl font-black text-[var(--text-primary)] tracking-tight leading-none">{t('map')}</h2>
-                            <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1">{markers.length} {t('activeMarkers')}</p>
+                            <h2 className="text-2xl font-black text-[var(--soft-text-main)] tracking-tight leading-none">{t('map')}</h2>
+                            <p className="text-[10px] font-black text-[var(--soft-text-muted)] uppercase tracking-widest mt-2">
+                                <span className="text-indigo-600">{markers.length}</span> {t('activeMarkers')}
+                            </p>
                         </div>
                     </Row>
 
-                    <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-[var(--bg-surface)] rounded-full border border-[var(--border-color)] shadow-sm">
-                        <span className="relative flex h-2.5 w-2.5">
+                    <div className="hidden md:flex items-center gap-3 px-5 py-2.5 bg-[var(--soft-bg-card)] rounded-full border border-[var(--border-subtle)] shadow-sm">
+                        <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                         </span>
-                        <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Live GPS Feed</span>
+                        <span className="text-[10px] font-black text-[var(--soft-text-main)] uppercase tracking-[0.1em]">{t('liveGPSFeed')}</span>
                     </div>
                 </Row>
 
                 {/* Map Container */}
-                <Card padding={0} className="flex-1 min-h-0 overflow-hidden relative border border-[var(--border-color)]">
+                <Card padding={0} className="flex-1 min-h-0 overflow-hidden relative border border-[var(--border-subtle)] rounded-[var(--radius-outer)] shadow-xl bg-[var(--soft-bg-inner)]">
                     <DeviceMap markers={markers} height="100%" />
                     <MapLegend />
                 </Card>
