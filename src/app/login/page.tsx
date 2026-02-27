@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSettings } from '@/context/SettingsContext';
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
     const { t, language, setLanguage } = useSettings();
@@ -94,11 +94,10 @@ export default function LoginPage() {
                                 {t('email')}
                             </label>
                             <div className="relative group">
-                                <Mail className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors`} size={18} />
                                 <input
                                     type="email"
                                     required
-                                    className={`w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl ${isRTL ? 'pr-14 pl-5' : 'pl-14 pr-5'} text-sm font-bold text-slate-700 outline-none focus:border-indigo-600 focus:bg-white transition-all shadow-sm`}
+                                    className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 text-sm font-bold text-slate-700 outline-none focus:border-indigo-600 focus:bg-white transition-all shadow-sm"
                                     placeholder="admin@healthytag.dz"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -116,11 +115,10 @@ export default function LoginPage() {
                                 </button>
                             </div>
                             <div className="relative group">
-                                <Lock className={`absolute ${isRTL ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors`} size={18} />
                                 <input
                                     type="password"
                                     required
-                                    className={`w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl ${isRTL ? 'pr-14 pl-5' : 'pl-14 pr-5'} text-sm font-bold text-slate-700 outline-none focus:border-indigo-600 focus:bg-white transition-all shadow-sm`}
+                                    className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 text-sm font-bold text-slate-700 outline-none focus:border-indigo-600 focus:bg-white transition-all shadow-sm"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
