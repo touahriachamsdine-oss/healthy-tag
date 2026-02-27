@@ -222,9 +222,7 @@ body {
 }
 
 /* RTL Support for common patterns */
-[dir='rtl'] .icon-soft {
-  /* RTL specific adjustments if needed */
-}
+/* (Currently handled by standard layout) */
 
 /* Animations */
 @keyframes fadeIn {
@@ -259,4 +257,89 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--soft-text-muted);
+}
+
+@media print {
+
+  /* Hide all interactive and layout elements */
+  nav,
+  sidebar,
+  aside,
+  header aside,
+  .no-print,
+  .sidebar-container,
+  button:not(.print-only),
+  .btn-soft,
+  .badge-soft,
+  [role="navigation"],
+  [role="button"] {
+    display: none !important;
+  }
+
+  /* Reset main container spacing */
+  main,
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Reset colors for paper saving and readability */
+  :root {
+    --bg-body: #ffffff !important;
+    --soft-bg-card: #ffffff !important;
+    --soft-bg-inner: #ffffff !important;
+    --soft-text-main: #000000 !important;
+    --soft-text-sub: #333333 !important;
+    --border-subtle: #dddddd !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 10pt;
+  }
+
+  .card-soft {
+    box-shadow: none !important;
+    border: 1px solid #eee !important;
+    break-inside: avoid;
+    margin-bottom: 20px !important;
+  }
+
+  /* Table styling for print */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid #eee !important;
+    padding: 10px 5px !important;
+    text-align: left !important;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4;
+    margin: 1.5cm;
+  }
+
+  /* Force background colors if user allows */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }

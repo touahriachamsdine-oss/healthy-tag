@@ -13,6 +13,10 @@ export default function ReportsPage() {
     const [devices, setDevices] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    const handleExportPDF = () => {
+        window.print();
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -48,6 +52,16 @@ export default function ReportsPage() {
             <Stack gap={8} className="pb-32">
                 {/* Header */}
                 <div className="flex flex-col gap-2 mb-8 border-b border-[var(--border-subtle)] pb-8">
+                    <div className="hidden print:flex items-center justify-between mb-8">
+                        <div>
+                            <h2 className="text-2xl font-black text-indigo-600">Healthy Tag</h2>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Official Regulatory Report</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase">Generated On</p>
+                            <p className="text-sm font-bold">{new Date().toLocaleString()}</p>
+                        </div>
+                    </div>
                     <h1 className="text-4xl font-black text-[var(--soft-text-main)] tracking-tight">{t('reports')}</h1>
                     <p className="text-[var(--soft-text-sub)] font-medium max-w-2xl">
                         Generate and download regulatory compliance documents for your cold chain storage facilities.
@@ -64,7 +78,10 @@ export default function ReportsPage() {
                                 </div>
                                 <h3 className="text-xl font-bold text-[var(--soft-text-main)] mb-3">{report.title}</h3>
                                 <p className="text-sm font-medium text-[var(--soft-text-sub)] mb-8 leading-relaxed opacity-80">{report.desc}</p>
-                                <button className="w-full h-12 bg-[var(--soft-primary)] hover:bg-indigo-600 text-white rounded-[20px] font-bold text-sm shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all active:scale-95">
+                                <button
+                                    onClick={handleExportPDF}
+                                    className="w-full h-12 bg-[var(--soft-primary)] hover:bg-indigo-600 text-white rounded-[20px] font-bold text-sm shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all active:scale-95"
+                                >
                                     <Download size={18} />
                                     {t('exportPDF') || 'Export PDF'}
                                 </button>
